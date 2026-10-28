@@ -1,0 +1,48 @@
+{
+  "tool": "cangjie-tools v2.5.0",
+  "published_hashes": {
+    "capability-destinations.json": "c6798614760623d2e795aa610eb0bbdafe56bd5a0e5c992874287c0fc288a747",
+    "key-point-trading-skill\\SKILL.md": "6a504520d5b11fa77081249af6a5fc75040d16b1fa8ab36824a3ae85f18a172b",
+    "min-resistance-trend-skill\\SKILL.md": "d327100255406adbbd6902b78f464755eb4db1bb628889c70db51c3cc7ba6037",
+    "mind-state-discipline-skill\\SKILL.md": "fdf5384457d6a65de23ebb5d8f96a10cc97ec0303b7e739fbdbbdadef5f50544",
+    "position-holding-exit-skill\\SKILL.md": "c0cdfeb04d854a64a7fe28f896699096a6f182091bce276dfb0ca1534b6fafca",
+    "probe-and-scale-in-skill\\SKILL.md": "98a83782679fc527c8d204c042c9fd03381b833cc0da530a5fe1b7e2e54c1cc0",
+    "stock-trader-recollection-skill-router\\references\\capabilities\\forecast-log.md": "59fb0b8ffd642c4c3346a079da6665a9991e08e2b5067ee91bb1e013cda0edfa",
+    "stock-trader-recollection-skill-router\\references\\capabilities\\key-point-trading-skill.md": "3083201ba39532a53fe9fd3a402ab1b8bdd148b80733774bd3aba42ba9b1af5a",
+    "stock-trader-recollection-skill-router\\references\\capabilities\\liquidity-and-execution.md": "e9edbd238cea4897c862c836e44d6788d941833e52a9f5deaff06a3edd1a20d1",
+    "stock-trader-recollection-skill-router\\references\\capabilities\\livermore-rules-checklist.md": "fe7bfbd9103ed03cea91705772cfd4ce7e61ba8f8e0c21282ac67f96b388f206",
+    "stock-trader-recollection-skill-router\\references\\capabilities\\min-resistance-trend-skill.md": "40f754f0ac75f07f0c6964225053452a6e9373232ecbd36200d00c0135dc5d74",
+    "stock-trader-recollection-skill-router\\references\\capabilities\\mind-state-discipline-skill.md": "7284b958cb0325138475f17c6b8d0d76ec0256339598e1ad9e1f3d94647fbb91",
+    "stock-trader-recollection-skill-router\\references\\capabilities\\position-holding-exit-skill.md": "c4158b523df3035184a45556bca418a19e90d3cb4b4e6f08f870eb83236f14b7",
+    "stock-trader-recollection-skill-router\\references\\capabilities\\probe-and-scale-in-skill.md": "6d21aa8fa4bce4db46a10ea2e8c2947780eee37b903d97a76e9477b892e61155",
+    "stock-trader-recollection-skill-router\\references\\capabilities\\stock-sector-behavior-skill.md": "e1980abf30ac8bbf4c7a24acd084cfe7150660ccde0a2cfeb52ae64436a9a593",
+    "stock-trader-recollection-skill-router\\references\\capabilities\\tips-and-authority-defense-skill.md": "ee3404f3ef76b8df286ddadd808f6723594f8ca3b62e52cf2be8acab5d407403",
+    "stock-trader-recollection-skill-router\\references\\capability-index.md": "a84dc2486d4b2a4150ec706d3ad88ed993ad9f98fa281ff7713997610867334d",
+    "stock-trader-recollection-skill-router\\references\\cheatsheet.md": "e6e98a07c53d1cf3d2a29369c0f4114a92edfa31e3709628cb0341ce47856488",
+    "stock-trader-recollection-skill-router\\references\\glossary.md": "0b5828caf92d0629712e310381aaff2a123d82a0a915209931c9969d19f63942",
+    "stock-trader-recollection-skill-router\\references\\overview.md": "8cb8a8ca862441154afcf38319314a5b832b297563dc4704f4779b4fc0c36145",
+    "stock-trader-recollection-skill-router\\SKILL.md": "f3d28bc9b1503e919c395193f1f62d3527040ca76970f89eaa90185bcdc9fd68",
+    "stock-sector-behavior-skill\\SKILL.md": "cd30c2ca57de0ef8cfc791cb5da498d73ac9b3706db40ead0bd7175d9d557344",
+    "tips-and-authority-defense-skill\\SKILL.md": "ac8c79de7f0bc73445e8134158524928e911ddc16e19a4e75247c2026c46bcca"
+  },
+  "note": "update/重编译前比对 published_hashes；检测到本地手改不得静默覆盖",
+  "bundle_id": "bundle.stock-trader-recollection-skill-memoirs",
+  "bundle_sha256": "fa5b461aa1fc84a87e4574441d6b702ec2c2cd8c69167e7a1974b9cdf27d2952",
+  "variant": "pack",
+  "run_id": "run-20261024-050040-a5f464",
+  "decision": {
+    "schema_version": 1,
+    "requested": "pack",
+    "selected": "pack",
+    "decision_policy": "single-first-v1",
+    "skill_budget": 8,
+    "promoted_count": 7,
+    "capability_count": 10,
+    "reasons": [
+      "用户显式选择 pack，auto 决策器不覆盖用户选择"
+    ],
+    "alternative": "single（1 个入口 + 10 张内部能力卡）",
+    "user_confirmed": true,
+    "preserve_strategy_on_update": true
+  }
+}

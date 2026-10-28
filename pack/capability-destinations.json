@@ -1,0 +1,49 @@
+{
+  "generated_by": "cangjie-tools v2.5.0",
+  "bundle_id": "bundle.stock-trader-recollection-skill-memoirs",
+  "router_entrypoint": "stock-trader-recollection-skill-router",
+  "entrypoint_count": 8,
+  "capability_count": 10,
+  "destinations": {
+    "cap.som.min-resistance-trend-skill": {
+      "promoted_to": "min-resistance-trend-skill",
+      "router_view": "stock-trader-recollection-skill-router/references/capabilities/min-resistance-trend-skill.md"
+    },
+    "cap.som.key-point-trading-skill": {
+      "promoted_to": "key-point-trading-skill",
+      "router_view": "stock-trader-recollection-skill-router/references/capabilities/key-point-trading-skill.md"
+    },
+    "cap.som.probe-and-scale-in-skill": {
+      "promoted_to": "probe-and-scale-in-skill",
+      "router_view": "stock-trader-recollection-skill-router/references/capabilities/probe-and-scale-in-skill.md"
+    },
+    "cap.som.position-holding-exit-skill": {
+      "promoted_to": "position-holding-exit-skill",
+      "router_view": "stock-trader-recollection-skill-router/references/capabilities/position-holding-exit-skill.md"
+    },
+    "cap.som.mind-state-discipline-skill": {
+      "promoted_to": "mind-state-discipline-skill",
+      "router_view": "stock-trader-recollection-skill-router/references/capabilities/mind-state-discipline-skill.md"
+    },
+    "cap.som.tips-and-authority-defense-skill": {
+      "promoted_to": "tips-and-authority-defense-skill",
+      "router_view": "stock-trader-recollection-skill-router/references/capabilities/tips-and-authority-defense-skill.md"
+    },
+    "cap.som.stock-sector-behavior-skill": {
+      "promoted_to": "stock-sector-behavior-skill",
+      "router_view": "stock-trader-recollection-skill-router/references/capabilities/stock-sector-behavior-skill.md"
+    },
+    "cap.som.liquidity-and-execution": {
+      "served_by": "stock-trader-recollection-skill-router",
+      "card": "stock-trader-recollection-skill-router/references/capabilities/liquidity-and-execution-skill.md"
+    },
+    "cap.som.forecast-log": {
+      "served_by": "stock-trader-recollection-skill-router",
+      "card": "stock-trader-recollection-skill-router/references/capabilities/forecast-log-skill.md"
+    },
+    "cap.som.livermore-rules-checklist": {
+      "served_by": "stock-trader-recollection-skill-router",
+      "card": "stock-trader-recollection-skill-router/references/capabilities/livermore-rules-checklist-skill.md"
+    }
+  }
+}

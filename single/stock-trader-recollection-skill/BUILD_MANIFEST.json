@@ -1,0 +1,40 @@
+{
+  "tool": "cangjie-tools v2.5.0",
+  "published_hashes": {
+    "references\\capabilities\\forecast-log.md": "59fb0b8ffd642c4c3346a079da6665a9991e08e2b5067ee91bb1e013cda0edfa",
+    "references\\capabilities\\key-point-trading-skill.md": "3083201ba39532a53fe9fd3a402ab1b8bdd148b80733774bd3aba42ba9b1af5a",
+    "references\\capabilities\\liquidity-and-execution.md": "e9edbd238cea4897c862c836e44d6788d941833e52a9f5deaff06a3edd1a20d1",
+    "references\\capabilities\\livermore-rules-checklist.md": "fe7bfbd9103ed03cea91705772cfd4ce7e61ba8f8e0c21282ac67f96b388f206",
+    "references\\capabilities\\min-resistance-trend-skill.md": "40f754f0ac75f07f0c6964225053452a6e9373232ecbd36200d00c0135dc5d74",
+    "references\\capabilities\\mind-state-discipline-skill.md": "7284b958cb0325138475f17c6b8d0d76ec0256339598e1ad9e1f3d94647fbb91",
+    "references\\capabilities\\position-holding-exit-skill.md": "c4158b523df3035184a45556bca418a19e90d3cb4b4e6f08f870eb83236f14b7",
+    "references\\capabilities\\probe-and-scale-in-skill.md": "6d21aa8fa4bce4db46a10ea2e8c2947780eee37b903d97a76e9477b892e61155",
+    "references\\capabilities\\stock-sector-behavior-skill.md": "e1980abf30ac8bbf4c7a24acd084cfe7150660ccde0a2cfeb52ae64436a9a593",
+    "references\\capabilities\\tips-and-authority-defense-skill.md": "ee3404f3ef76b8df286ddadd808f6723594f8ca3b62e52cf2be8acab5d407403",
+    "references\\capability-index.md": "a84dc2486d4b2a4150ec706d3ad88ed993ad9f98fa281ff7713997610867334d",
+    "references\\cheatsheet.md": "e6e98a07c53d1cf3d2a29369c0f4114a92edfa31e3709628cb0341ce47856488",
+    "references\\glossary.md": "0b5828caf92d0629712e310381aaff2a123d82a0a915209931c9969d19f63942",
+    "references\\overview.md": "8cb8a8ca862441154afcf38319314a5b832b297563dc4704f4779b4fc0c36145",
+    "SKILL.md": "d3e780eed77d63e11faccdbcdf1148a9b870fca456fc16709f75db87f399d076"
+  },
+  "note": "update/重编译前比对 published_hashes；检测到本地手改不得静默覆盖",
+  "bundle_id": "bundle.stock-trader-recollection-skill-memoirs",
+  "bundle_sha256": "fa5b461aa1fc84a87e4574441d6b702ec2c2cd8c69167e7a1974b9cdf27d2952",
+  "variant": "single",
+  "run_id": "run-20261024-050036-cb9365",
+  "decision": {
+    "schema_version": 1,
+    "requested": "single",
+    "selected": "single",
+    "decision_policy": "single-first-v1",
+    "skill_budget": 8,
+    "promoted_count": 7,
+    "capability_count": 10,
+    "reasons": [
+      "用户显式选择 single，auto 决策器不覆盖用户选择"
+    ],
+    "alternative": "compact pack（1 个来源路由入口 + 7 个晋级 Skill，共 8 个可发现入口）",
+    "user_confirmed": true,
+    "preserve_strategy_on_update": true
+  }
+}
