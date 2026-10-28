@@ -1,4 +1,4 @@
-<h1 align="center">Reminiscences of a Stock Operator Skill</h1>
+<h1 align="center">Stock Trader Recollection Skill</h1>
 
 <p align="center"><a href="README.md">中文</a> | English</p>
 
