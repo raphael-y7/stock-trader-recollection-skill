@@ -1,0 +1,69 @@
+{
+  "skill": "position-holding-exit-skill",
+  "version": "1.0.0",
+  "test_cases": [
+    {
+      "id": "position-holding-exit-skill-st-01",
+      "type": "should_trigger",
+      "prompt": "我的票赚了 25% 了，天天怕利润回吐。要不要先卖一半落袋为安，等它跌下来我再接回来？",
+      "expected_behavior": "调用头寸管理：老火鸡三问——卖出理由若只是赚差价等回落则回到持有；为赚差价卖出的头寸大概率接不回来，趋势未坏不丢头寸（『这是牛市』）。",
+      "notes": "正面场景：浮盈持有 vs 止盈（intent：浮盈单该不该止盈或持有）。"
+    },
+    {
+      "id": "position-holding-exit-skill-st-02",
+      "type": "should_trigger",
+      "prompt": "我的止损挂在成本下方 8%，最近这票涨了不少。止损位要不要跟着往上移（trailing stop）？怎么移才不会被正常回调扫出去？",
+      "expected_behavior": "调用头寸管理：赫恩式跟进止损——止损挂最后一笔成交价下一个步长之下，创新高即上移、只上移不下移；步长按波动率自定并声明『约定』。",
+      "notes": "正面场景：移动止损设置（intent：移动止损怎么设怎么移）。"
+    },
+    {
+      "id": "position-holding-exit-skill-st-03",
+      "type": "should_trigger",
+      "prompt": "这波涨了大半年，最近冲高回落好几波都涨不动了。趋势是不是走完了？什么信号出现我必须清仓离场？",
+      "expected_behavior": "调用头寸管理：退出触发器——冲高回落后再不能上涨（确认式退出）/跌破关键位/识别到自己做错；执行用市价利索离场，绝不求卖最高点。",
+      "notes": "正面场景：何时清仓离场（intent：何时清仓离场）。"
+    },
+    {
+      "id": "position-holding-exit-skill-st-04",
+      "type": "should_trigger",
+      "prompt": "去年有只票我 30 块就卖了，现在都 60 了，肠子悔青。我总是把大牛股拿丢，怎么才能改掉卖飞的毛病？",
+      "expected_behavior": "调用头寸管理：诊断丢头寸来源——为赚小差价丢掉趋势利润载体，『没人承担得起失去头寸的后果』；给出持有纪律（大势未坏不卖）与不抓头尾两个 1/8 美元的规则。",
+      "notes": "正面场景：卖飞/丢头寸（intent：卖飞丢头寸怎么办）。"
+    },
+    {
+      "id": "position-holding-exit-skill-snt-01",
+      "type": "should_not_trigger",
+      "prompt": "我账户现在空仓，一只票都没拿。就想问第一笔该买多少、后面怎么往上加、加到什么程度停手？",
+      "expected_behavior": "不应调用头寸管理卡；首笔之前的问题（从 0 建到目标仓位）应触发的试探—验证—加码建仓卡。",
+      "notes": "跨卡混淆诱饵→probe-and-scale-in-skill。区分线：问题发生在首笔之前→入场卡；本卡管建好之后。"
+    },
+    {
+      "id": "position-holding-exit-skill-snt-02",
+      "type": "should_not_trigger",
+      "prompt": "我一持仓就失眠，半夜爬起来看外盘，心慌得不行。是不是我心态有问题？怎么调整？",
+      "expected_behavior": "不应调用头寸管理卡（可顺带提示减仓，但主诉是状态）；应触发交易心理与状态自检卡。",
+      "notes": "跨卡混淆诱饵→mind-state-discipline-skill。区分线：『为什么拿不住』的内在状态归心理自检卡，本卡直接给仓位动作规则。"
+    },
+    {
+      "id": "position-holding-exit-skill-snt-03",
+      "type": "should_not_trigger",
+      "prompt": "先别管我那几只票怎么处理。我就想搞清楚：现在大盘到底是牛市还是熊市？",
+      "expected_behavior": "不应调用头寸管理卡；大盘方向判定应触发最小阻力路线趋势判读卡。",
+      "notes": "跨卡混淆诱饵→min-resistance-trend-skill。区分线：大势判定是本卡 Step 1 的前置，本身归趋势判读卡。"
+    },
+    {
+      "id": "position-holding-exit-skill-edge-01",
+      "type": "edge_case",
+      "prompt": "我那票横了三个月没什么趋势，我就用牛市拿住不动那套纪律一直拿着，行不行？",
+      "expected_behavior": "拒绝误用：持有纪律以趋势存在为前提，横盘无趋势市应空仓等突破（横盘规则归关键点体系卡）；本卡不是『死扛许可证』。",
+      "notes": "边界：横盘市误用持有纪律（B 段反场景第 1 条）。"
+    },
+    {
+      "id": "position-holding-exit-skill-edge-02",
+      "type": "edge_case",
+      "prompt": "我认错了想跑，可我的票今天跌停封死根本卖不掉，怎么办？",
+      "expected_behavior": "退出触发已命中但窗口关闭：给 T+1/跌停约束下的预案（次日集合竞价、盘前挂单排队），不承诺当日可成交，不引入等反弹的扛单逻辑。",
+      "notes": "边界：A 股制度边界——『零延迟离场』在跌停日不可即时执行，须换算为预案（阶段 0 批判）。"
+    }
+  ]
+}

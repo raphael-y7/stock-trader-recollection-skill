@@ -132,6 +132,14 @@ stock-trader-recollection-skill/
 ├── BOOK_OVERVIEW.md               ← 整书理解（Adler 四步拆解，阶段 0 产出）
 ├── verified.md                    ← 81 条候选的三重验证结论与合并组
 ├── INDEX.md                       ← skill 地图（能力总表 + 依赖关系 + 加载顺序）
+├── TEST_SUMMARY.md                ← Stage 4 压力测试摘要（范围 / 结构检查 / 结果 / 回归接入）
+├── CANGJIE_ADAPTATION.md          ← 仓颉适配说明（文本状态 / 蒸馏目标 / 证据规则 / 使用边界）
+├── candidates/                    ← 阶段 1 候选池（5 份文本候选；图片 / PDF 不入仓）
+│   ├── framework.md
+│   ├── principle.md
+│   ├── case.md
+│   ├── counter-example.md
+│   └── glossary.md
 ├── bundle/                        ← 能力卡源（本次蒸馏的唯一真源）
 │   ├── verified.yaml              ← 10 个能力的规范化定义（slug / 判据 / 去向）
 │   ├── cards/                     ← 10 张能力卡，文件名统一以 -skill.md 结尾
@@ -142,6 +150,7 @@ stock-trader-recollection-skill/
 │   └── stock-trader-recollection-skill/
 │       ├── SKILL.md               ← 入口：触发条件 + 路由表 + 加载规则
 │       ├── BUILD_MANIFEST.json    ← 编译清单与文件哈希
+│       ├── test-prompts.json      ← 90 条触发用例副本（suite 级，随入口 skill 归档）
 │       └── references/
 │           ├── overview.md        ← 整书概览
 │           ├── capability-index.md  ← 完整意图与关键词索引
@@ -168,6 +177,7 @@ stock-trader-recollection-skill/
 │   │   └── SKILL.md
 │   └── stock-sector-behavior-skill/
 │       └── SKILL.md
+├── （注）← 各 skill 目录均含 test-prompts.json（该能力的触发与边界用例）
 └── evals/                          ← 生成过程的测试材料
     ├── test-prompts.json           ← 90 条触发用例（正向 / 诱饵 / edge）
     └── test-results.md             ← 逐项评分、失败与回炉修复记录

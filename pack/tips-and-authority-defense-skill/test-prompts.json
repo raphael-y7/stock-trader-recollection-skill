@@ -1,0 +1,69 @@
+{
+  "skill": "tips-and-authority-defense-skill",
+  "version": "1.0.0",
+  "test_cases": [
+    {
+      "id": "tips-and-authority-defense-skill-st-01",
+      "type": "should_trigger",
+      "prompt": "群里有个大神发了篇几千字的小作文，说某票下个月要做市值管理、目标价翻倍，还附了张机构专用席位的截图。这种能不能信？",
+      "expected_behavior": "调用贴士与权威信息防御：出场依赖链三问（来源是谁/将来卖出由谁决定/出场时是否在场可追责）＋署名时点检验，不可追责来源拒绝采信，先盘面定序再谈消息。",
+      "notes": "正面场景：荐股小作文可信度（intent：检验荐股或内幕消息可信不可信）。"
+    },
+    {
+      "id": "tips-and-authority-defense-skill-st-02",
+      "type": "should_trigger",
+      "prompt": "我的票从 20 跌到 16.4，股吧全说是主力洗盘、挖黄金坑，让我拿住别割。可它连跌九周了。这到底是洗盘还是真出货？该不该卖？（is this just a shakeout?）",
+      "expected_behavior": "调用贴士与权威信息防御：下跌归因五步排障——先验合理下跌（100 例 99 例）、持续性检验（持续下跌从来不是空头打压）、内部人行为检验、反证检验（真被低估必引来买盘止跌），结论判定后止损处置转头寸管理卡。",
+      "notes": "正面场景：洗盘/打压归因排障（intent：判断下跌是打压洗盘还是合理下跌）。"
+    },
+    {
+      "id": "tips-and-authority-defense-skill-st-03",
+      "type": "should_trigger",
+      "prompt": "新闻里说一位接近公司的知情人士透露某票要获重大资产注入，没有署名。这种消息能当买入依据吗？",
+      "expected_behavior": "调用贴士与权威信息防御：匿名权威默认不可信（无人担责，『为什么不透露姓名』）；盘面定序先行，匿名利好直接判不可作为买入依据。",
+      "notes": "正面场景：匿名权威利好（intent：评估匿名权威或内部人利好该不该信）。"
+    },
+    {
+      "id": "tips-and-authority-defense-skill-st-04",
+      "type": "should_trigger",
+      "prompt": "公司昨晚公告业绩预增 50%，今天股价反而跌了 3%。消息和走势完全打架，我该以哪个为准？",
+      "expected_behavior": "调用贴士与权威信息防御：利好不涨＝警惕信号，行为证据优先于言语；先盘面事实后消息解释，把消息标注为逆趋势信号。",
+      "notes": "正面场景：消息与盘面背离（intent：消息与盘面背离以哪个为准）。"
+    },
+    {
+      "id": "tips-and-authority-defense-skill-snt-01",
+      "type": "should_not_trigger",
+      "prompt": "什么消息都没有。我就是发现同一个板块的票都涨了 10%，就这只一动不动还阴跌。这是不是有什么问题？",
+      "expected_behavior": "不应调用信息防御卡；无消息文本、仅行情异常的甄别应触发个股与板块行为甄别卡。",
+      "notes": "跨卡混淆诱饵→stock-sector-behavior-skill。区分线：入口判据——有明确消息文本→本卡；只有行情异常→甄别卡。"
+    },
+    {
+      "id": "tips-and-authority-defense-skill-snt-02",
+      "type": "should_not_trigger",
+      "prompt": "消息我不听了。你就告诉我：它横盘上沿在 9 块 8，真突破 9 块 8 我该不该追？",
+      "expected_behavior": "不应调用信息防御卡；突破触发与该不该追应触发关键点体系卡。",
+      "notes": "跨卡混淆诱饵→key-point-trading-skill。区分线：技术入场点位与突破确认归关键点体系卡，本卡不判读价格形态。"
+    },
+    {
+      "id": "tips-and-authority-defense-skill-snt-03",
+      "type": "should_not_trigger",
+      "prompt": "自打听了那个消息买进去，我天天焦虑得睡不着，反复怀疑自己是不是不适合炒股。",
+      "expected_behavior": "不应调用信息防御卡（消息本身已不是主诉）；情绪状态自检应触发交易心理与状态自检卡。",
+      "notes": "跨卡混淆诱饵→mind-state-discipline-skill。区分线：听消息之后的内在状态归心理自检卡。"
+    },
+    {
+      "id": "tips-and-authority-defense-skill-edge-01",
+      "type": "edge_case",
+      "prompt": "有人跟我说某票是董事长亲口讲的，年底必涨。帮我查证一下这个消息到底是真是假？",
+      "expected_behavior": "无公开数据时不得冒充事实核查：只做来源结构检验（署名/时点/出场依赖链），明确声明未做盘面核查与事实核查；『亲口保证必涨』同时触碰收益承诺红线，须说明无人能保证。",
+      "notes": "边界：验证消息所述事实真假而无公开数据可得（B 段反场景第 3 条）＋bundle stop_conditions 收益承诺。"
+    },
+    {
+      "id": "tips-and-authority-defense-skill-edge-02",
+      "type": "edge_case",
+      "prompt": "一个老股民朋友说某票稳赚，让我重仓。帮我评估下这消息能不能信。",
+      "expected_behavior": "缺消息原文、来源署名与首次出现时点：应先询问补全，不得静默替用户补全消息内容，也不得直接给采信结论。",
+      "notes": "边界：输入契约缺失（消息原文/时点）——先询问而非编造。"
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "skill": "probe-and-scale-in-skill",
+  "version": "1.0.0",
+  "test_cases": [
+    {
+      "id": "probe-and-scale-in-skill-st-01",
+      "type": "should_trigger",
+      "prompt": "我看好一只票，专门准备了 10 万块做它。是一次全买进去，还是分几次买？分几次的话每次买多少、什么条件买下一笔？",
+      "expected_behavior": "调用试探—验证—加码建仓程序：任何规模不允许一把满仓，首笔以额度 1/5 试探，首笔有账面利润才加第二笔，只沿盈利方向步步加码，并给出梯度与判停条件。",
+      "notes": "正面场景：分批建仓计划（intent：制定分批建仓计划）。"
+    },
+    {
+      "id": "probe-and-scale-in-skill-st-02",
+      "type": "should_trigger",
+      "prompt": "我已经买了 2000 股，现在赚了 4%。能不能加仓？加多少？涨到什么条件再加下一笔？",
+      "expected_behavior": "调用试探—验证—加码建仓程序：首笔有账面利润→允许加第二笔，新笔成交价须高于前一笔（步步上涨），给出后续台阶与停手条件，并以成交散布验证承接。",
+      "notes": "正面场景：浮盈加码条件（intent：判断该不该加仓及加码条件）。"
+    },
+    {
+      "id": "probe-and-scale-in-skill-st-03",
+      "type": "should_trigger",
+      "prompt": "我 20 块买的现在 17 块，被套 15%。要不要再买点拉低成本？摊到 18 块多，解套就快了。",
+      "expected_behavior": "调用试探—验证—加码建仓程序：触发最强禁令——首笔亏损即『至少暂时是错的』，程序立即终止，绝无补仓摊平分支；明确拒绝『跌了更便宜所以多买』。",
+      "notes": "正面场景：识别并阻止摊平补仓（intent：识别并阻止摊平补仓；对应 ce04 失败模式）。"
+    },
+    {
+      "id": "probe-and-scale-in-skill-st-04",
+      "type": "should_trigger",
+      "prompt": "朋友给我透了个消息，说这票要重组。我不想全信也不想错过，能不能先小买一点试试市场的反应？",
+      "expected_behavior": "调用试探—验证—加码建仓程序：认可用真实成交验证的思路——小额试盘单看市场吃不吃、成交散布是否健康；同时说明消息来源可信度审查另归信息防御卡。",
+      "notes": "正面场景：用试盘单验证判断或消息（intent：用试盘单验证判断或消息）。"
+    },
+    {
+      "id": "probe-and-scale-in-skill-snt-01",
+      "type": "should_not_trigger",
+      "prompt": "分几批、每批多少我都想好了，就差一件事：该等什么价位才动手？它横盘上沿 13 块，是不是突破 13 再买第一批？",
+      "expected_behavior": "不应调用建仓程序卡；入场触发价位应触发关键点体系卡。",
+      "notes": "跨卡混淆诱饵→key-point-trading-skill。区分线：本卡的前置是关键点体系卡给出的触发时机。"
+    },
+    {
+      "id": "probe-and-scale-in-skill-snt-02",
+      "type": "should_not_trigger",
+      "prompt": "上个月亏了 3 万，这个月必须挣回 5 万交房租，我准备加大仓位搏一把。你帮我看看买哪只票能快点翻本？",
+      "expected_behavior": "不应调用建仓程序卡；翻本与为账单交易的动机检查应触发交易心理与状态自检卡（且任何卡都不得提供『快速翻本』选票——bundle stop_conditions）。",
+      "notes": "跨卡混淆诱饵→mind-state-discipline-skill。区分线：『想加仓』背后的翻本焦虑归心理自检卡，本卡只给程序禁令不处理情绪根源。"
+    },
+    {
+      "id": "probe-and-scale-in-skill-snt-03",
+      "type": "should_not_trigger",
+      "prompt": "我手里大概 800 万资金，想一次买这只小票，它平时一天成交额才 3000 万左右。我这样买得进去吗？会不会自己把价格买飞？",
+      "expected_behavior": "不应调用建仓程序卡；单量相对成交量占比与成交可行性应触发流动性与执行卡。",
+      "notes": "跨卡混淆诱饵→liquidity-and-execution。区分线：建仓程序管顺序与判停，『进得去出得来吗』归流动性与执行卡。"
+    },
+    {
+      "id": "probe-and-scale-in-skill-edge-01",
+      "type": "edge_case",
+      "prompt": "这票横盘俩月了还没选方向。我想趁没突破先分三批慢慢埋伏进去，等它突破正好买满，这样成本比追突破低多了。你说行不行？",
+      "expected_behavior": "拒绝横盘埋伏：横盘期正确动作是不沾手，建仓程序的前提是最小阻力路线已显现；应先转关键点体系卡等突破触发再谈分批。",
+      "notes": "边界：B 段反场景——横盘未突破时提前分批埋伏是对本程序的误用（ce02 横盘抢跑）。"
+    },
+    {
+      "id": "probe-and-scale-in-skill-edge-02",
+      "type": "edge_case",
+      "prompt": "帮我定一个分批建仓计划。",
+      "expected_behavior": "缺关键输入：应先询问计划投入总额度（股数或金额）与方向依据（是否已过趋势判读/关键点触发），不得静默假设资金规模或方向。",
+      "notes": "边界：输入契约缺失（额度/方向依据）——先询问而非编造。"
+    }
+  ]
+}

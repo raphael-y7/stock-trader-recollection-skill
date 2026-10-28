@@ -132,6 +132,14 @@ stock-trader-recollection-skill/
 ├── BOOK_OVERVIEW.md               ← whole-book understanding (Adler, stage 0)
 ├── verified.md                    ← triple-verification results for 81 candidates, with merge groups
 ├── INDEX.md                       ← skill map (capability table + dependencies + loading order)
+├── TEST_SUMMARY.md                ← stage 4 stress-test summary (scope / structure / results / regression use)
+├── CANGJIE_ADAPTATION.md          ← cangjie adaptation note (source text / distillation goals / evidence rules / limits)
+├── candidates/                    ← stage 1 candidate pool (5 text candidates; no images or PDFs)
+│   ├── framework.md
+│   ├── principle.md
+│   ├── case.md
+│   ├── counter-example.md
+│   └── glossary.md
 ├── bundle/                        ← the card source (single source of truth for this distillation)
 │   ├── verified.yaml              ← normalised definitions of the 10 capabilities (slug / criteria / destination)
 │   ├── cards/                     ← 10 capability cards, filenames all ending in -skill.md
@@ -142,6 +150,7 @@ stock-trader-recollection-skill/
 │   └── stock-trader-recollection-skill/
 │       ├── SKILL.md               ← entry: trigger conditions + routing table + loading rules
 │       ├── BUILD_MANIFEST.json    ← build manifest and file hashes
+│       ├── test-prompts.json      ← copy of the 90 trigger cases (suite level, kept with the entry skill)
 │       └── references/
 │           ├── overview.md        ← whole-book overview
 │           ├── capability-index.md  ← full intent and keyword index
@@ -168,6 +177,7 @@ stock-trader-recollection-skill/
 │   │   └── SKILL.md
 │   └── stock-sector-behavior-skill/
 │       └── SKILL.md
+├── (note) ← every skill directory also ships a test-prompts.json (trigger and boundary cases)
 └── evals/                          ← test material from the generation process
     ├── test-prompts.json           ← 90 trigger cases (positives / decoys / edge)
     └── test-results.md             ← item-by-item scores, failures and rework record

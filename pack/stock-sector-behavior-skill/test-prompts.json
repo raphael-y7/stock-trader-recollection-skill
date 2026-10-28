@@ -1,0 +1,69 @@
+{
+  "skill": "stock-sector-behavior-skill",
+  "version": "1.0.0",
+  "test_cases": [
+    {
+      "id": "stock-sector-behavior-skill-st-01",
+      "type": "should_trigger",
+      "prompt": "光伏板块这波集体涨了 15%，就这只还趴着不动。是不是可以埋伏进去等它补涨？",
+      "expected_behavior": "调用个股与板块行为甄别：掉队先排除『吸筹待涨』解释（成交量与行情特点检验），排除不掉则不买；掉队且逆跌＝内部人不愿接货的看空/规避信号；『补涨』叙事是锚定陷阱。",
+      "notes": "正面场景：掉队股能否埋伏等补涨（intent：掉队股能不能埋伏等补涨）。"
+    },
+    {
+      "id": "stock-sector-behavior-skill-st-02",
+      "type": "should_trigger",
+      "prompt": "这轮行情的几个老龙头这两天集体冲高回落 6%，都没收回去。是不是这波行情要见顶了？",
+      "expected_behavior": "调用个股与板块行为甄别：领头羊组集体滞涨回落且不再收复＝牛市尾声预警；给出减仓/退出提示（顶部处置动作归头寸管理卡）。",
+      "notes": "正面场景：龙头滞涨见顶预警（intent：龙头滞涨是不是行情见顶）。"
+    },
+    {
+      "id": "stock-sector-behavior-skill-st-03",
+      "type": "should_trigger",
+      "prompt": "这只票以前的性子是板块涨它必跟、弹性还更大。最近板块涨它死活不动，怪得很。这算怎么回事？",
+      "expected_behavior": "调用个股与板块行为甄别：习性过滤——当前行为偏离历史习性且无可见事实解释→不碰；已持有则触发退出检查（归头寸管理卡）。",
+      "notes": "正面场景：个股习性异常（intent：个股走法偏离习性怎么办）。"
+    },
+    {
+      "id": "stock-sector-behavior-skill-st-04",
+      "type": "should_trigger",
+      "prompt": "帮我把锂电板块这十只票做个强弱对比：谁在领涨、谁创新高、谁掉队，列个表。",
+      "expected_behavior": "调用个股与板块行为甄别：板块一致性对照表（成员×区间涨跌幅/创新高/回落收复/量能配合），掉队者与逆行者显式标出，每条信号附数据支撑。",
+      "notes": "正面场景：板块强弱对照（intent：板块强弱对照怎么做）。"
+    },
+    {
+      "id": "stock-sector-behavior-skill-snt-01",
+      "type": "should_not_trigger",
+      "prompt": "板块的事先放一放。我就想确认：大盘现在到底是牛市还是熊市？这决定我要不要碰股票。",
+      "expected_behavior": "不应调用板块甄别卡；大盘方向结论应触发最小阻力路线趋势判读卡。",
+      "notes": "跨卡混淆诱饵→min-resistance-trend-skill。区分线：本卡在既定大势下做个股/板块交叉验证，不出大盘方向结论。"
+    },
+    {
+      "id": "stock-sector-behavior-skill-snt-02",
+      "type": "should_not_trigger",
+      "prompt": "有篇自媒体文章说光伏下个月出政策利好，让我提前埋伏掉队的补涨股。这篇文章靠谱吗？",
+      "expected_behavior": "不应调用板块甄别卡；有明确消息文本的可信度裁决应触发贴士与权威信息防御卡（『提前埋伏补涨』恰是甄别卡要警示的锚定陷阱，可作佐证但入口归信息防御）。",
+      "notes": "跨卡混淆诱饵→tips-and-authority-defense-skill。区分线：有消息文本→信息防御卡；只有行情异常→本卡。"
+    },
+    {
+      "id": "stock-sector-behavior-skill-snt-03",
+      "type": "should_not_trigger",
+      "prompt": "对照表不用做了。我持有的是板块龙头，浮盈也不少，你就直接告诉我这单怎么拿、止损怎么移、什么时候走。",
+      "expected_behavior": "不应调用板块甄别卡；持有/止损/退出动作应触发头寸管理卡。",
+      "notes": "跨卡混淆诱饵→position-holding-exit-skill。区分线：本卡产出信号（发现异常），信号后的处置动作归头寸管理卡。"
+    },
+    {
+      "id": "stock-sector-behavior-skill-edge-01",
+      "type": "edge_case",
+      "prompt": "帮我分析下这只票在它板块里算不算掉队。",
+      "expected_behavior": "判停：未提供板块成员与行情、可对照成员不足 3 只→降级输出『信息不足，仅按不熟不碰处理』，不做一致性结论，不虚构成员数据。",
+      "notes": "边界：板块成员过少的降级处理（E 段判停＋B 段反场景第 3 条）。"
+    },
+    {
+      "id": "stock-sector-behavior-skill-edge-02",
+      "type": "edge_case",
+      "prompt": "从基本面看，这家公司市盈率才 15 倍，是板块里最便宜的。它掉队是不是被错杀了？能不能抄？",
+      "expected_behavior": "不做估值判断：本卡只看价格行为，不回答『公司好不好』；同时指出『板块里最便宜』是锚定陷阱而非机会信号（ce18 圭亚那黄金教训）。",
+      "notes": "边界：基本面选股反场景（B 段反场景第 1 条）。"
+    }
+  ]
+}

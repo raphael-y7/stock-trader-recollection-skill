@@ -1,0 +1,702 @@
+[
+  {
+    "skill": "min-resistance-trend-skill",
+    "capability_id": "cap.som.min-resistance-trend-skill",
+    "version": "1.0.0",
+    "test_cases": [
+      {
+        "id": "min-resistance-trend-skill-st-01",
+        "type": "should_trigger",
+        "prompt": "帮我看看这只票的日线：最近四个月低点从 10.5 抬到 11.2 再到 12.0，高点从 12.4 抬到 13.1 再到 13.9，现在收在 13.5。它现在算什么趋势？我该看多还是看空？",
+        "expected_behavior": "调用最小阻力路线趋势判读：按高低点结构判为上升趋势（更高的高点＋更高的低点），输出方向结论（只考虑买/持）与时机结论（无确认信号则等待），不做目标价预测。",
+        "notes": "正面场景：高低点三分类判读＋方向判定（intent：判断当前市场趋势方向）。"
+      },
+      {
+        "id": "min-resistance-trend-skill-st-02",
+        "type": "should_trigger",
+        "prompt": "这票从 15 块一路阴跌到现在 11 块，中间就反弹过一两次，每次都没超过前一个高点，我又想抄底又怕接飞刀。现在到底该站哪边？",
+        "expected_behavior": "调用最小阻力路线趋势判读：判为下降趋势（更低的低点＋更低的高点），A 股无裸卖空映射为减仓/空仓观望；不因『跌了很多』而反向抄底。",
+        "notes": "正面场景：下降趋势判读＋多空立场（intent：决定多空立场）。"
+      },
+      {
+        "id": "min-resistance-trend-skill-st-03",
+        "type": "should_trigger",
+        "prompt": "我的票之前涨得很顺，回调都很浅，最近两个月完全变了：天天阴跌，偶尔反弹一下就又掉头往下。趋势是不是已经变了？我不想听原因，就告诉我方向。",
+        "expected_behavior": "调用最小阻力路线趋势判读：按『连续推进＋小幅回落 → 逐步退却＋偶尔反弹』结构判定最小阻力路线已转向，转变判断不需要等解释，直接更新状态并提示动作。",
+        "notes": "正面场景：趋势转变识别（intent：识别趋势是否转变；『不需要解释』语言信号）。"
+      },
+      {
+        "id": "min-resistance-trend-skill-st-04",
+        "type": "should_trigger",
+        "prompt": "研报都说这家公司基本面向好、业绩预增，可股价就是一直创新低，技术和消息完全打架。我该信盘面还是信研报？",
+        "expected_behavior": "调用最小阻力路线趋势判读：执行分层校验——纸带信号与基本形势冲突时以纸带为准，把基本分析结论降级为背景备注，并在结论中注明两层是否一致。",
+        "notes": "正面场景：基本形势与盘面冲突的裁决（intent：核对基本形势与盘面是否一致）。"
+      },
+      {
+        "id": "min-resistance-trend-skill-snt-01",
+        "type": "should_not_trigger",
+        "prompt": "方向的事我自己会看。你就直接说，这个票我该挂多少价位买？12.5 还是 12.8？给我一个具体的买入价。",
+        "expected_behavior": "不应调用趋势判读卡；『在哪个具体价位动手』应触发关键点体系卡。",
+        "notes": "跨卡混淆诱饵→key-point-trading-skill。区分线：本卡停在『方向＋时机闸门』，具体价位归关键点体系卡（min-resistance-trend-skill A2 相邻区分线第 1 条）。"
+      },
+      {
+        "id": "min-resistance-trend-skill-snt-02",
+        "type": "should_not_trigger",
+        "prompt": "我手里的票浮盈 30% 了，就是拿不住，天天想卖一半落袋。止盈和移动止损（trailing stop）该怎么设？",
+        "expected_behavior": "不应调用趋势判读卡；持仓处置问题应触发头寸管理卡。",
+        "notes": "跨卡混淆诱饵→position-holding-exit-skill。区分线：判『动手后拿多久、怎么加减仓退出』归头寸管理卡。"
+      },
+      {
+        "id": "min-resistance-trend-skill-snt-03",
+        "type": "should_not_trigger",
+        "prompt": "A股我就不看了，帮我看看现在原油期货能不能做空？哪个合约合适？",
+        "expected_behavior": "不应调用本包任何能力卡；期货等市场的直接操作指引超出本书范围（out_of_scope）。",
+        "notes": "一般诱饵：out-of-scope 市场与品种，非本书射程。"
+      },
+      {
+        "id": "min-resistance-trend-skill-edge-01",
+        "type": "edge_case",
+        "prompt": "别跟我讲什么趋势结构，你就说大盘明天是涨还是跌，给个准话。",
+        "expected_behavior": "不输出涨跌预测：纸带不预测报价（原书：绝不会告诉你下一个星期四下午 1:35 你有多少身家）。可说明为何拒答并引导到方向判读方法，但不得给出『明天涨/跌』结论。",
+        "notes": "边界：单日涨跌预测是本卡禁答项（B 段反场景）——区分严肃方向判读与报价预测。"
+      },
+      {
+        "id": "min-resistance-trend-skill-edge-02",
+        "type": "edge_case",
+        "prompt": "现在市场算什么趋势？能进场吗？帮我判断一下。",
+        "expected_behavior": "缺标的、周期与高低点数据：应先询问要判读的标的与周期，不得静默猜周期，也不得凭空给出三分类结论。",
+        "notes": "边界：输入契约缺失——先询问而非编造（E 段输入契约①）。"
+      }
+    ]
+  },
+  {
+    "skill": "key-point-trading-skill",
+    "capability_id": "cap.som.key-point-trading-skill",
+    "version": "1.0.0",
+    "test_cases": [
+      {
+        "id": "key-point-trading-skill-st-01",
+        "type": "should_trigger",
+        "prompt": "某股三个月一直在 11.2 到 12.0 之间横着，今天放量收在 12.6。我能追吗？还是再等等？",
+        "expected_behavior": "调用关键点体系：建关键点清单（区间上沿 12.0/下沿 11.2/前高等），价格已出区间→核对突破确认两点（确定无疑＋顺突破方向），预设失效位（跌回 12.0 之下即判整轮行情假象离场）后再谈动手。",
+        "notes": "正面场景：横盘区间突破触发（intent：判断突破该不该追）。"
+      },
+      {
+        "id": "key-point-trading-skill-st-02",
+        "type": "should_trigger",
+        "prompt": "这票都涨到 80 多块了，历史上从来没这么高过。是不是太贵了不能买？要不等等回调再上车？",
+        "expected_behavior": "调用关键点体系：执行价格高低否决项检查——『太高了不敢买』按原书判为无效理由删除；买点只认突破关键点，绝对价格高低不构成买卖理由。",
+        "notes": "正面场景：破除太贵/太便宜的价格锚（intent：破除价格锚）。"
+      },
+      {
+        "id": "key-point-trading-skill-st-03",
+        "type": "should_trigger",
+        "prompt": "上周我追了个突破，买在 23.5，这两天又跌回 22.8 了。是不是这波突破失败了？我该怎么办？",
+        "expected_behavior": "调用关键点体系：执行失效条款——跌回起涨关键点之下即判定整轮行情为假象，按市价离场，不解释、不等待，『唯一该做的就是停止继续犯错』。",
+        "notes": "正面场景：追突破被套的失效判定与离场（intent：设定突破交易的失效位）。"
+      },
+      {
+        "id": "key-point-trading-skill-st-04",
+        "type": "should_trigger",
+        "prompt": "最近大盘死水一潭，我一天不交易就手痒，总觉得该做点什么。你帮我看看现在到底有没有行情可做？",
+        "expected_behavior": "调用关键点体系：可交易性判停——近期波动幅度与方向清晰度不足以构成一笔正经行情→结论空仓等待，『没有行情』本身就是事实，不做就是操作。",
+        "notes": "正面场景：没行情就不做的频率闸门（intent：判定当前有没有行情可做）。"
+      },
+      {
+        "id": "key-point-trading-skill-snt-01",
+        "type": "should_not_trigger",
+        "prompt": "价位的事先放一放。我就想确认一件事：现在这个市场整体是牛市还是熊市？大方向定了我自己会挑买点。",
+        "expected_behavior": "不应调用关键点体系卡；大盘方向判定应触发最小阻力路线趋势判读卡。",
+        "notes": "跨卡混淆诱饵→min-resistance-trend-skill。区分线：本卡的前提是趋势状态已由趋势判读卡给出（横向→本卡，定向→本卡提供触发器）。"
+      },
+      {
+        "id": "key-point-trading-skill-snt-02",
+        "type": "should_not_trigger",
+        "prompt": "突破条件我确认过了，准备进场。就是想问这笔钱该一把买进去还是分三批买？每一批买多少怎么定？",
+        "expected_behavior": "不应调用关键点体系卡；分批建仓顺序与仓位分配应触发试探—验证—加码建仓卡。",
+        "notes": "跨卡混淆诱饵→probe-and-scale-in-skill。区分线：价位触发归本卡，动手后怎么分批建仓归建仓程序卡。"
+      },
+      {
+        "id": "key-point-trading-skill-snt-03",
+        "type": "should_not_trigger",
+        "prompt": "群里朋友说这票马上要突破 20 块了，还说主力已经埋伏好了就等拉抬。这种说法靠谱吗？",
+        "expected_behavior": "不应调用关键点体系卡；『主力埋伏』属消息可信度裁决，应触发贴士与权威信息防御卡。",
+        "notes": "跨卡混淆诱饵→tips-and-authority-defense-skill。区分线：涉及消息文本的可信度归信息防御卡，本卡只认盘面价位结构。"
+      },
+      {
+        "id": "key-point-trading-skill-edge-01",
+        "type": "edge_case",
+        "prompt": "某股在 15 到 16 块之间横了俩月，现在 15.5。我又怕踏空又怕被套，要不要先买一半放着？",
+        "expected_behavior": "判停分支：当前价位于区间内→结论观望/不沾手，输出『向上突破 16 买、向下跌破 15 卖/回避』的待命触发价，不给区间内动手许可；同时附可交易性一行。",
+        "notes": "边界：区间内不动手的判停（Step 2）——横盘抢跑是书中 ce02 失败模式。"
+      },
+      {
+        "id": "key-point-trading-skill-edge-02",
+        "type": "edge_case",
+        "prompt": "这票今天涨停封板突破了前高 18.5。我明天集合竞价直接挂高价追进去行不行？",
+        "expected_behavior": "涨停封板当日无法验证突破真假：应以收盘站上＋次日不跌回为确认（标注『约定』，原书为连续报价市场），提示 T+1 与追高风险，并先预设失效位再谈进场。",
+        "notes": "边界：A 股涨跌停制度下的突破确认滞后（阶段 0 批判②）。"
+      }
+    ]
+  },
+  {
+    "skill": "probe-and-scale-in-skill",
+    "capability_id": "cap.som.probe-and-scale-in-skill",
+    "version": "1.0.0",
+    "test_cases": [
+      {
+        "id": "probe-and-scale-in-skill-st-01",
+        "type": "should_trigger",
+        "prompt": "我看好一只票，专门准备了 10 万块做它。是一次全买进去，还是分几次买？分几次的话每次买多少、什么条件买下一笔？",
+        "expected_behavior": "调用试探—验证—加码建仓程序：任何规模不允许一把满仓，首笔以额度 1/5 试探，首笔有账面利润才加第二笔，只沿盈利方向步步加码，并给出梯度与判停条件。",
+        "notes": "正面场景：分批建仓计划（intent：制定分批建仓计划）。"
+      },
+      {
+        "id": "probe-and-scale-in-skill-st-02",
+        "type": "should_trigger",
+        "prompt": "我已经买了 2000 股，现在赚了 4%。能不能加仓？加多少？涨到什么条件再加下一笔？",
+        "expected_behavior": "调用试探—验证—加码建仓程序：首笔有账面利润→允许加第二笔，新笔成交价须高于前一笔（步步上涨），给出后续台阶与停手条件，并以成交散布验证承接。",
+        "notes": "正面场景：浮盈加码条件（intent：判断该不该加仓及加码条件）。"
+      },
+      {
+        "id": "probe-and-scale-in-skill-st-03",
+        "type": "should_trigger",
+        "prompt": "我 20 块买的现在 17 块，被套 15%。要不要再买点拉低成本？摊到 18 块多，解套就快了。",
+        "expected_behavior": "调用试探—验证—加码建仓程序：触发最强禁令——首笔亏损即『至少暂时是错的』，程序立即终止，绝无补仓摊平分支；明确拒绝『跌了更便宜所以多买』。",
+        "notes": "正面场景：识别并阻止摊平补仓（intent：识别并阻止摊平补仓；对应 ce04 失败模式）。"
+      },
+      {
+        "id": "probe-and-scale-in-skill-st-04",
+        "type": "should_trigger",
+        "prompt": "朋友给我透了个消息，说这票要重组。我不想全信也不想错过，能不能先小买一点试试市场的反应？",
+        "expected_behavior": "调用试探—验证—加码建仓程序：认可用真实成交验证的思路——小额试盘单看市场吃不吃、成交散布是否健康；同时说明消息来源可信度审查另归信息防御卡。",
+        "notes": "正面场景：用试盘单验证判断或消息（intent：用试盘单验证判断或消息）。"
+      },
+      {
+        "id": "probe-and-scale-in-skill-snt-01",
+        "type": "should_not_trigger",
+        "prompt": "分几批、每批多少我都想好了，就差一件事：该等什么价位才动手？它横盘上沿 13 块，是不是突破 13 再买第一批？",
+        "expected_behavior": "不应调用建仓程序卡；入场触发价位应触发关键点体系卡。",
+        "notes": "跨卡混淆诱饵→key-point-trading-skill。区分线：本卡的前置是关键点体系卡给出的触发时机。"
+      },
+      {
+        "id": "probe-and-scale-in-skill-snt-02",
+        "type": "should_not_trigger",
+        "prompt": "上个月亏了 3 万，这个月必须挣回 5 万交房租，我准备加大仓位搏一把。你帮我看看买哪只票能快点翻本？",
+        "expected_behavior": "不应调用建仓程序卡；翻本与为账单交易的动机检查应触发交易心理与状态自检卡（且任何卡都不得提供『快速翻本』选票——bundle stop_conditions）。",
+        "notes": "跨卡混淆诱饵→mind-state-discipline-skill。区分线：『想加仓』背后的翻本焦虑归心理自检卡，本卡只给程序禁令不处理情绪根源。"
+      },
+      {
+        "id": "probe-and-scale-in-skill-snt-03",
+        "type": "should_not_trigger",
+        "prompt": "我手里大概 800 万资金，想一次买这只小票，它平时一天成交额才 3000 万左右。我这样买得进去吗？会不会自己把价格买飞？",
+        "expected_behavior": "不应调用建仓程序卡；单量相对成交量占比与成交可行性应触发流动性与执行卡。",
+        "notes": "跨卡混淆诱饵→liquidity-and-execution。区分线：建仓程序管顺序与判停，『进得去出得来吗』归流动性与执行卡。"
+      },
+      {
+        "id": "probe-and-scale-in-skill-edge-01",
+        "type": "edge_case",
+        "prompt": "这票横盘俩月了还没选方向。我想趁没突破先分三批慢慢埋伏进去，等它突破正好买满，这样成本比追突破低多了。你说行不行？",
+        "expected_behavior": "拒绝横盘埋伏：横盘期正确动作是不沾手，建仓程序的前提是最小阻力路线已显现；应先转关键点体系卡等突破触发再谈分批。",
+        "notes": "边界：B 段反场景——横盘未突破时提前分批埋伏是对本程序的误用（ce02 横盘抢跑）。"
+      },
+      {
+        "id": "probe-and-scale-in-skill-edge-02",
+        "type": "edge_case",
+        "prompt": "帮我定一个分批建仓计划。",
+        "expected_behavior": "缺关键输入：应先询问计划投入总额度（股数或金额）与方向依据（是否已过趋势判读/关键点触发），不得静默假设资金规模或方向。",
+        "notes": "边界：输入契约缺失（额度/方向依据）——先询问而非编造。"
+      }
+    ]
+  },
+  {
+    "skill": "position-holding-exit-skill",
+    "capability_id": "cap.som.position-holding-exit-skill",
+    "version": "1.0.0",
+    "test_cases": [
+      {
+        "id": "position-holding-exit-skill-st-01",
+        "type": "should_trigger",
+        "prompt": "我的票赚了 25% 了，天天怕利润回吐。要不要先卖一半落袋为安，等它跌下来我再接回来？",
+        "expected_behavior": "调用头寸管理：老火鸡三问——卖出理由若只是赚差价等回落则回到持有；为赚差价卖出的头寸大概率接不回来，趋势未坏不丢头寸（『这是牛市』）。",
+        "notes": "正面场景：浮盈持有 vs 止盈（intent：浮盈单该不该止盈或持有）。"
+      },
+      {
+        "id": "position-holding-exit-skill-st-02",
+        "type": "should_trigger",
+        "prompt": "我的止损挂在成本下方 8%，最近这票涨了不少。止损位要不要跟着往上移（trailing stop）？怎么移才不会被正常回调扫出去？",
+        "expected_behavior": "调用头寸管理：赫恩式跟进止损——止损挂最后一笔成交价下一个步长之下，创新高即上移、只上移不下移；步长按波动率自定并声明『约定』。",
+        "notes": "正面场景：移动止损设置（intent：移动止损怎么设怎么移）。"
+      },
+      {
+        "id": "position-holding-exit-skill-st-03",
+        "type": "should_trigger",
+        "prompt": "这波涨了大半年，最近冲高回落好几波都涨不动了。趋势是不是走完了？什么信号出现我必须清仓离场？",
+        "expected_behavior": "调用头寸管理：退出触发器——冲高回落后再不能上涨（确认式退出）/跌破关键位/识别到自己做错；执行用市价利索离场，绝不求卖最高点。",
+        "notes": "正面场景：何时清仓离场（intent：何时清仓离场）。"
+      },
+      {
+        "id": "position-holding-exit-skill-st-04",
+        "type": "should_trigger",
+        "prompt": "去年有只票我 30 块就卖了，现在都 60 了，肠子悔青。我总是把大牛股拿丢，怎么才能改掉卖飞的毛病？",
+        "expected_behavior": "调用头寸管理：诊断丢头寸来源——为赚小差价丢掉趋势利润载体，『没人承担得起失去头寸的后果』；给出持有纪律（大势未坏不卖）与不抓头尾两个 1/8 美元的规则。",
+        "notes": "正面场景：卖飞/丢头寸（intent：卖飞丢头寸怎么办）。"
+      },
+      {
+        "id": "position-holding-exit-skill-snt-01",
+        "type": "should_not_trigger",
+        "prompt": "我账户现在空仓，一只票都没拿。就想问第一笔该买多少、后面怎么往上加、加到什么程度停手？",
+        "expected_behavior": "不应调用头寸管理卡；首笔之前的问题（从 0 建到目标仓位）应触发的试探—验证—加码建仓卡。",
+        "notes": "跨卡混淆诱饵→probe-and-scale-in-skill。区分线：问题发生在首笔之前→入场卡；本卡管建好之后。"
+      },
+      {
+        "id": "position-holding-exit-skill-snt-02",
+        "type": "should_not_trigger",
+        "prompt": "我一持仓就失眠，半夜爬起来看外盘，心慌得不行。是不是我心态有问题？怎么调整？",
+        "expected_behavior": "不应调用头寸管理卡（可顺带提示减仓，但主诉是状态）；应触发交易心理与状态自检卡。",
+        "notes": "跨卡混淆诱饵→mind-state-discipline-skill。区分线：『为什么拿不住』的内在状态归心理自检卡，本卡直接给仓位动作规则。"
+      },
+      {
+        "id": "position-holding-exit-skill-snt-03",
+        "type": "should_not_trigger",
+        "prompt": "先别管我那几只票怎么处理。我就想搞清楚：现在大盘到底是牛市还是熊市？",
+        "expected_behavior": "不应调用头寸管理卡；大盘方向判定应触发最小阻力路线趋势判读卡。",
+        "notes": "跨卡混淆诱饵→min-resistance-trend-skill。区分线：大势判定是本卡 Step 1 的前置，本身归趋势判读卡。"
+      },
+      {
+        "id": "position-holding-exit-skill-edge-01",
+        "type": "edge_case",
+        "prompt": "我那票横了三个月没什么趋势，我就用牛市拿住不动那套纪律一直拿着，行不行？",
+        "expected_behavior": "拒绝误用：持有纪律以趋势存在为前提，横盘无趋势市应空仓等突破（横盘规则归关键点体系卡）；本卡不是『死扛许可证』。",
+        "notes": "边界：横盘市误用持有纪律（B 段反场景第 1 条）。"
+      },
+      {
+        "id": "position-holding-exit-skill-edge-02",
+        "type": "edge_case",
+        "prompt": "我认错了想跑，可我的票今天跌停封死根本卖不掉，怎么办？",
+        "expected_behavior": "退出触发已命中但窗口关闭：给 T+1/跌停约束下的预案（次日集合竞价、盘前挂单排队），不承诺当日可成交，不引入等反弹的扛单逻辑。",
+        "notes": "边界：A 股制度边界——『零延迟离场』在跌停日不可即时执行，须换算为预案（阶段 0 批判）。"
+      }
+    ]
+  },
+  {
+    "skill": "mind-state-discipline-skill",
+    "capability_id": "cap.som.mind-state-discipline-skill",
+    "version": "1.0.0",
+    "test_cases": [
+      {
+        "id": "mind-state-discipline-skill-st-01",
+        "type": "should_trigger",
+        "prompt": "连亏五把了，我把下个月要还房贷的 3 万块都转进了证券账户。今天开盘前心跳得厉害，就想满仓干一票，把亏的 2.8 万全挣回来。",
+        "expected_behavior": "调用交易心理与状态自检：三查命中动机不纯（翻本/为账单交易）→撤单停手、生活资金与交易资金隔离，期间只观察不交易，并给出恢复复检条件。",
+        "notes": "正面场景：翻本冲动＋为账单交易（intent：翻本报复性交易自检/为账单交易检查）。"
+      },
+      {
+        "id": "mind-state-discipline-skill-st-02",
+        "type": "should_trigger",
+        "prompt": "这个单子我满仓拿了两周，天天睡不着，半夜心跳加速摸手机看盘。是不是仓位太重了？要不要减点？",
+        "expected_behavior": "调用交易心理与状态自检：仓位压力检查命中（睡不着＝头寸过大）→减仓，减到『睡得着』为止，并给出恢复条件。",
+        "notes": "正面场景：仓位压力失眠（intent：仓位压力睡不着怎么办）。"
+      },
+      {
+        "id": "mind-state-discipline-skill-st-03",
+        "type": "should_trigger",
+        "prompt": "我那票亏了 12%，但我觉得公司基本面没变，是市场错了，主力在故意砸坑。我就拿着等它回来，市场迟早还我公道。",
+        "expected_behavior": "调用交易心理与状态自检：识别希望恐惧倒置（亏损抱希望）与『与纸带争辩』→归零重判：只说盘面事实（高低点结构、关键位得失），不援引『市场错了』叙事。",
+        "notes": "正面场景：亏损抱希望＋与市场争辩（intent：与市场争辩立场绑架怎么破）。"
+      },
+      {
+        "id": "mind-state-discipline-skill-st-04",
+        "type": "should_trigger",
+        "prompt": "上次我一把亏掉一半积蓄。我想认真复盘到底错在哪一环，把它变成一条以后能对照检查的铁规矩，怎么弄？",
+        "expected_behavior": "调用交易心理与状态自检：错误转化四步——定位错误环节→归因写行为链→写成『绝不……』戒律→下不为例验收，产出一条可勾选的戒律条目。",
+        "notes": "正面场景：大亏后复盘防再犯（intent：大亏后怎么复盘防再犯）。"
+      },
+      {
+        "id": "mind-state-discipline-skill-snt-01",
+        "type": "should_not_trigger",
+        "prompt": "心态我自我感觉还行。你就直接告诉我：这单止损挂多少钱合适、浮盈的单怎么跟、真要卖怎么卖？",
+        "expected_behavior": "不应调用心理自检卡；具体止损价/跟进/执行属仓位动作规则，应触发头寸管理卡。",
+        "notes": "跨卡混淆诱饵→position-holding-exit-skill。区分线：本卡输出自检结论与停手/减仓指令，仓位动作规则归头寸管理卡。"
+      },
+      {
+        "id": "mind-state-discipline-skill-snt-02",
+        "type": "should_not_trigger",
+        "prompt": "我倒不是心态崩了。我就是想搞清楚：群里那个自称内部人士发的利好截图，到底能不能信？",
+        "expected_behavior": "不应调用心理自检卡；外部信息可信度检验应触发贴士与权威信息防御卡。",
+        "notes": "跨卡混淆诱饵→tips-and-authority-defense-skill。区分线：本卡审内在状态（情绪/动机），外来信息的结构与可信度归信息防御卡。"
+      },
+      {
+        "id": "mind-state-discipline-skill-snt-03",
+        "type": "should_not_trigger",
+        "prompt": "别跟我聊情绪。你就对照利弗莫尔那 15 条规则，看看我今天在亏损票上补仓这个动作违反了哪一条。",
+        "expected_behavior": "不应调用心理自检卡；条文检索应触发利弗莫尔成文规则总表卡（先查条文违规，再问违规动机才归本卡）。",
+        "notes": "跨卡混淆诱饵→livermore-rules-checklist。区分线：动作 vs 条文的检索归规则总表卡。"
+      },
+      {
+        "id": "mind-state-discipline-skill-edge-01",
+        "type": "edge_case",
+        "prompt": "亏掉一半积蓄之后，我已经失眠两个月了，情绪一直很低落，对什么都提不起兴趣。你多陪我聊聊交易，让我好受一点。",
+        "expected_behavior": "识别超出交易语境的状态问题：声明本卡不是心理治疗，长期失眠/抑郁倾向应寻求专业帮助（医疗/心理咨询）；交易侧仅给停手与资金隔离建议，不当情绪陪伴供给。",
+        "notes": "边界：非心理治疗（B 段反场景第 2 条）——区分交易状态管理与心理健康问题。"
+      },
+      {
+        "id": "mind-state-discipline-skill-edge-02",
+        "type": "edge_case",
+        "prompt": "帮我做个交易前的心理自检。",
+        "expected_behavior": "缺输入：应先询问持仓与浮盈亏、近期盈亏记录、睡眠与情绪自述、资金是否混用，不得静默勾选三查。",
+        "notes": "边界：输入契约缺失（持仓明细/状态自述）——先询问而非编造。"
+      }
+    ]
+  },
+  {
+    "skill": "tips-and-authority-defense-skill",
+    "capability_id": "cap.som.tips-and-authority-defense-skill",
+    "version": "1.0.0",
+    "test_cases": [
+      {
+        "id": "tips-and-authority-defense-skill-st-01",
+        "type": "should_trigger",
+        "prompt": "群里有个大神发了篇几千字的小作文，说某票下个月要做市值管理、目标价翻倍，还附了张机构专用席位的截图。这种能不能信？",
+        "expected_behavior": "调用贴士与权威信息防御：出场依赖链三问（来源是谁/将来卖出由谁决定/出场时是否在场可追责）＋署名时点检验，不可追责来源拒绝采信，先盘面定序再谈消息。",
+        "notes": "正面场景：荐股小作文可信度（intent：检验荐股或内幕消息可信不可信）。"
+      },
+      {
+        "id": "tips-and-authority-defense-skill-st-02",
+        "type": "should_trigger",
+        "prompt": "我的票从 20 跌到 16.4，股吧全说是主力洗盘、挖黄金坑，让我拿住别割。可它连跌九周了。这到底是洗盘还是真出货？该不该卖？（is this just a shakeout?）",
+        "expected_behavior": "调用贴士与权威信息防御：下跌归因五步排障——先验合理下跌（100 例 99 例）、持续性检验（持续下跌从来不是空头打压）、内部人行为检验、反证检验（真被低估必引来买盘止跌），结论判定后止损处置转头寸管理卡。",
+        "notes": "正面场景：洗盘/打压归因排障（intent：判断下跌是打压洗盘还是合理下跌）。"
+      },
+      {
+        "id": "tips-and-authority-defense-skill-st-03",
+        "type": "should_trigger",
+        "prompt": "新闻里说一位接近公司的知情人士透露某票要获重大资产注入，没有署名。这种消息能当买入依据吗？",
+        "expected_behavior": "调用贴士与权威信息防御：匿名权威默认不可信（无人担责，『为什么不透露姓名』）；盘面定序先行，匿名利好直接判不可作为买入依据。",
+        "notes": "正面场景：匿名权威利好（intent：评估匿名权威或内部人利好该不该信）。"
+      },
+      {
+        "id": "tips-and-authority-defense-skill-st-04",
+        "type": "should_trigger",
+        "prompt": "公司昨晚公告业绩预增 50%，今天股价反而跌了 3%。消息和走势完全打架，我该以哪个为准？",
+        "expected_behavior": "调用贴士与权威信息防御：利好不涨＝警惕信号，行为证据优先于言语；先盘面事实后消息解释，把消息标注为逆趋势信号。",
+        "notes": "正面场景：消息与盘面背离（intent：消息与盘面背离以哪个为准）。"
+      },
+      {
+        "id": "tips-and-authority-defense-skill-snt-01",
+        "type": "should_not_trigger",
+        "prompt": "什么消息都没有。我就是发现同一个板块的票都涨了 10%，就这只一动不动还阴跌。这是不是有什么问题？",
+        "expected_behavior": "不应调用信息防御卡；无消息文本、仅行情异常的甄别应触发个股与板块行为甄别卡。",
+        "notes": "跨卡混淆诱饵→stock-sector-behavior-skill。区分线：入口判据——有明确消息文本→本卡；只有行情异常→甄别卡。"
+      },
+      {
+        "id": "tips-and-authority-defense-skill-snt-02",
+        "type": "should_not_trigger",
+        "prompt": "消息我不听了。你就告诉我：它横盘上沿在 9 块 8，真突破 9 块 8 我该不该追？",
+        "expected_behavior": "不应调用信息防御卡；突破触发与该不该追应触发关键点体系卡。",
+        "notes": "跨卡混淆诱饵→key-point-trading-skill。区分线：技术入场点位与突破确认归关键点体系卡，本卡不判读价格形态。"
+      },
+      {
+        "id": "tips-and-authority-defense-skill-snt-03",
+        "type": "should_not_trigger",
+        "prompt": "自打听了那个消息买进去，我天天焦虑得睡不着，反复怀疑自己是不是不适合炒股。",
+        "expected_behavior": "不应调用信息防御卡（消息本身已不是主诉）；情绪状态自检应触发交易心理与状态自检卡。",
+        "notes": "跨卡混淆诱饵→mind-state-discipline-skill。区分线：听消息之后的内在状态归心理自检卡。"
+      },
+      {
+        "id": "tips-and-authority-defense-skill-edge-01",
+        "type": "edge_case",
+        "prompt": "有人跟我说某票是董事长亲口讲的，年底必涨。帮我查证一下这个消息到底是真是假？",
+        "expected_behavior": "无公开数据时不得冒充事实核查：只做来源结构检验（署名/时点/出场依赖链），明确声明未做盘面核查与事实核查；『亲口保证必涨』同时触碰收益承诺红线，须说明无人能保证。",
+        "notes": "边界：验证消息所述事实真假而无公开数据可得（B 段反场景第 3 条）＋bundle stop_conditions 收益承诺。"
+      },
+      {
+        "id": "tips-and-authority-defense-skill-edge-02",
+        "type": "edge_case",
+        "prompt": "一个老股民朋友说某票稳赚，让我重仓。帮我评估下这消息能不能信。",
+        "expected_behavior": "缺消息原文、来源署名与首次出现时点：应先询问补全，不得静默替用户补全消息内容，也不得直接给采信结论。",
+        "notes": "边界：输入契约缺失（消息原文/时点）——先询问而非编造。"
+      }
+    ]
+  },
+  {
+    "skill": "stock-sector-behavior-skill",
+    "capability_id": "cap.som.stock-sector-behavior-skill",
+    "version": "1.0.0",
+    "test_cases": [
+      {
+        "id": "stock-sector-behavior-skill-st-01",
+        "type": "should_trigger",
+        "prompt": "光伏板块这波集体涨了 15%，就这只还趴着不动。是不是可以埋伏进去等它补涨？",
+        "expected_behavior": "调用个股与板块行为甄别：掉队先排除『吸筹待涨』解释（成交量与行情特点检验），排除不掉则不买；掉队且逆跌＝内部人不愿接货的看空/规避信号；『补涨』叙事是锚定陷阱。",
+        "notes": "正面场景：掉队股能否埋伏等补涨（intent：掉队股能不能埋伏等补涨）。"
+      },
+      {
+        "id": "stock-sector-behavior-skill-st-02",
+        "type": "should_trigger",
+        "prompt": "这轮行情的几个老龙头这两天集体冲高回落 6%，都没收回去。是不是这波行情要见顶了？",
+        "expected_behavior": "调用个股与板块行为甄别：领头羊组集体滞涨回落且不再收复＝牛市尾声预警；给出减仓/退出提示（顶部处置动作归头寸管理卡）。",
+        "notes": "正面场景：龙头滞涨见顶预警（intent：龙头滞涨是不是行情见顶）。"
+      },
+      {
+        "id": "stock-sector-behavior-skill-st-03",
+        "type": "should_trigger",
+        "prompt": "这只票以前的性子是板块涨它必跟、弹性还更大。最近板块涨它死活不动，怪得很。这算怎么回事？",
+        "expected_behavior": "调用个股与板块行为甄别：习性过滤——当前行为偏离历史习性且无可见事实解释→不碰；已持有则触发退出检查（归头寸管理卡）。",
+        "notes": "正面场景：个股习性异常（intent：个股走法偏离习性怎么办）。"
+      },
+      {
+        "id": "stock-sector-behavior-skill-st-04",
+        "type": "should_trigger",
+        "prompt": "帮我把锂电板块这十只票做个强弱对比：谁在领涨、谁创新高、谁掉队，列个表。",
+        "expected_behavior": "调用个股与板块行为甄别：板块一致性对照表（成员×区间涨跌幅/创新高/回落收复/量能配合），掉队者与逆行者显式标出，每条信号附数据支撑。",
+        "notes": "正面场景：板块强弱对照（intent：板块强弱对照怎么做）。"
+      },
+      {
+        "id": "stock-sector-behavior-skill-snt-01",
+        "type": "should_not_trigger",
+        "prompt": "板块的事先放一放。我就想确认：大盘现在到底是牛市还是熊市？这决定我要不要碰股票。",
+        "expected_behavior": "不应调用板块甄别卡；大盘方向结论应触发最小阻力路线趋势判读卡。",
+        "notes": "跨卡混淆诱饵→min-resistance-trend-skill。区分线：本卡在既定大势下做个股/板块交叉验证，不出大盘方向结论。"
+      },
+      {
+        "id": "stock-sector-behavior-skill-snt-02",
+        "type": "should_not_trigger",
+        "prompt": "有篇自媒体文章说光伏下个月出政策利好，让我提前埋伏掉队的补涨股。这篇文章靠谱吗？",
+        "expected_behavior": "不应调用板块甄别卡；有明确消息文本的可信度裁决应触发贴士与权威信息防御卡（『提前埋伏补涨』恰是甄别卡要警示的锚定陷阱，可作佐证但入口归信息防御）。",
+        "notes": "跨卡混淆诱饵→tips-and-authority-defense-skill。区分线：有消息文本→信息防御卡；只有行情异常→本卡。"
+      },
+      {
+        "id": "stock-sector-behavior-skill-snt-03",
+        "type": "should_not_trigger",
+        "prompt": "对照表不用做了。我持有的是板块龙头，浮盈也不少，你就直接告诉我这单怎么拿、止损怎么移、什么时候走。",
+        "expected_behavior": "不应调用板块甄别卡；持有/止损/退出动作应触发头寸管理卡。",
+        "notes": "跨卡混淆诱饵→position-holding-exit-skill。区分线：本卡产出信号（发现异常），信号后的处置动作归头寸管理卡。"
+      },
+      {
+        "id": "stock-sector-behavior-skill-edge-01",
+        "type": "edge_case",
+        "prompt": "帮我分析下这只票在它板块里算不算掉队。",
+        "expected_behavior": "判停：未提供板块成员与行情、可对照成员不足 3 只→降级输出『信息不足，仅按不熟不碰处理』，不做一致性结论，不虚构成员数据。",
+        "notes": "边界：板块成员过少的降级处理（E 段判停＋B 段反场景第 3 条）。"
+      },
+      {
+        "id": "stock-sector-behavior-skill-edge-02",
+        "type": "edge_case",
+        "prompt": "从基本面看，这家公司市盈率才 15 倍，是板块里最便宜的。它掉队是不是被错杀了？能不能抄？",
+        "expected_behavior": "不做估值判断：本卡只看价格行为，不回答『公司好不好』；同时指出『板块里最便宜』是锚定陷阱而非机会信号（ce18 圭亚那黄金教训）。",
+        "notes": "边界：基本面选股反场景（B 段反场景第 1 条）。"
+      }
+    ]
+  },
+  {
+    "skill": "liquidity-and-execution",
+    "capability_id": "cap.som.liquidity-and-execution",
+    "version": "1.0.0",
+    "test_cases": [
+      {
+        "id": "liquidity-and-execution-st-01",
+        "type": "should_trigger",
+        "prompt": "我想买 500 万块的一只小票，它一天成交额才 2000 多万。我一次买得进去吗？会不会自己把价格买飞？",
+        "expected_behavior": "调用流动性与执行：相对规模测算（占比超约定阈值→大额单），先试探单读市场胃口（轻松吸收且价格不跌＝有对手力量），分批进场，不做一次性大单。",
+        "notes": "正面场景：大单进出场可行性（intent：大单大额持仓进出场可行性）。"
+      },
+      {
+        "id": "liquidity-and-execution-st-02",
+        "type": "should_trigger",
+        "prompt": "我挂 24.5 卖了三天都没成交，这票就在 25 上下晃，是我挂得太贪了吗？还有，万一哪天一字跌停，是不是根本卖不出？",
+        "expected_behavior": "调用流动性与执行：成交偏差与不可成交风险——限价与市价的取舍、流动性窗口预置（能卖时卖，不等想卖时）、一字板属窗口关闭的应对预案。",
+        "notes": "正面场景：挂单不成交/一字板（intent：滑点挂单不成交涨跌停封板怎么办）。"
+      },
+      {
+        "id": "liquidity-and-execution-st-03",
+        "type": "should_trigger",
+        "prompt": "止损单到底用市价还是限价（limit or market order）？我怕挂限价跌穿了不成交，又怕市价被砸出个深坑。",
+        "expected_behavior": "调用流动性与执行：指令类型分工（约定：止损与离场用市价类成交优先，试探与建仓用限价类接受不成交）＋每张单写明预期成交价与可接受滑点上限。",
+        "notes": "正面场景：市价 vs 限价（intent：市价单还是限价单）。"
+      },
+      {
+        "id": "liquidity-and-execution-st-04",
+        "type": "should_trigger",
+        "prompt": "我的策略回测里信号价 10.00 就能成交，实盘每次都要多付三四厘，一年下来差好多。这个差距出在哪？怎么把它算进策略里？",
+        "expected_behavior": "调用流动性与执行：执行偏差是独立的亏损源——回测信号价与实盘成交价的系统性差须计入交易（滑点预算），『预期成交价＝看板价』的假设作废。",
+        "notes": "正面场景：回测与实盘系统性成交差（intent：回测与实盘系统性成交差）。"
+      },
+      {
+        "id": "liquidity-and-execution-snt-01",
+        "type": "should_not_trigger",
+        "prompt": "先别聊怎么成交。我就想知道这票我到底该拿还是该卖，仓位留几成。",
+        "expected_behavior": "不应调用流动性与执行卡；持有/退出决定应触发头寸管理卡。",
+        "notes": "跨卡混淆诱饵→position-holding-exit-skill。区分线：同一笔交易的决定层归头寸卡，可行性层归本卡（B 段明说仓位比例问题转头寸管理卡）。"
+      },
+      {
+        "id": "liquidity-and-execution-snt-02",
+        "type": "should_not_trigger",
+        "prompt": "分批我会分。我就想知道该盯什么价位：怎么判断 13 块这个位置算不算有效突破？",
+        "expected_behavior": "不应调用流动性与执行卡；触发价位与突破判定应触发关键点体系卡。",
+        "notes": "跨卡混淆诱饵→key-point-trading-skill。区分线：本卡不管价位，只管成交机制与成本。"
+      },
+      {
+        "id": "liquidity-and-execution-snt-03",
+        "type": "should_not_trigger",
+        "prompt": "帮我排个建仓计划：总仓多大、首笔买几分之一、什么条件加下一笔、什么情况停手。",
+        "expected_behavior": "不应调用流动性与执行卡；建仓程序应触发试探—验证—加码建仓卡。",
+        "notes": "跨卡混淆诱饵→probe-and-scale-in-skill。区分线：建仓顺序与判停归建仓程序卡。"
+      },
+      {
+        "id": "liquidity-and-execution-edge-01",
+        "type": "edge_case",
+        "prompt": "我想大笔买进某只票，帮我评估一下进得去吗。",
+        "expected_behavior": "缺下单数量与日均成交量：先询问，不得静默估算；用户拒绝提供则只输出方法框架，不输出可行性结论。",
+        "notes": "边界：输入契约缺失（数量/日均成交量）——先询问而非编造。"
+      },
+      {
+        "id": "liquidity-and-execution-edge-02",
+        "type": "edge_case",
+        "prompt": "我重仓的票连吃两个一字跌停，卖单排不上队。我想割肉根本卖不掉，是不是挂个市价单就能成交？",
+        "expected_behavior": "一字跌停属窗口关闭状态：市价单不承诺可成交；给 T+1 约束下的预案（次日集合竞价、盘前挂单排队），并提示后续仓位预留与流动性管理。",
+        "notes": "边界：A 股涨跌停『窗口关闭』（E 段判停——封板时任何立刻成交步骤转为等待预案，不承诺可成交）。"
+      }
+    ]
+  },
+  {
+    "skill": "forecast-log",
+    "capability_id": "cap.som.forecast-log",
+    "version": "1.0.0",
+    "test_cases": [
+      {
+        "id": "forecast-log-st-01",
+        "type": "should_trigger",
+        "prompt": "我炒股五年，总感觉自己判断挺准的，可账户一直亏。我想客观知道自己判断的胜率（track record）到底怎么样，有什么办法？",
+        "expected_behavior": "调用判断校准预测日志：建立事前成文、到期核对的判断记录制度，累计样本统计方向命中率；样本少于约定下限（20 条）时只做记录性陈述，不报告准确率。",
+        "notes": "正面场景：验证判断准确率（intent：验证自己判断的准确率）。"
+      },
+      {
+        "id": "forecast-log-st-02",
+        "type": "should_trigger",
+        "prompt": "每次行情走完我都拍大腿：我早就看出来要跌！朋友说我全是事后诸葛。这毛病怎么治？",
+        "expected_behavior": "调用判断校准预测日志：用『事前落笔即冻结、事后逐条判对错』的记录制度约束事后诸葛倾向，白纸黑字让『我早就说过』没有存身之地。",
+        "notes": "正面场景：拒绝事后诸葛（intent：拒绝事后诸葛）。"
+      },
+      {
+        "id": "forecast-log-st-03",
+        "type": "should_trigger",
+        "prompt": "我想练练盘感，但模拟盘赚了亏了都不心疼，练了也不算数。有没有更有约束的练习办法？",
+        "expected_behavior": "调用判断校准预测日志：以真实判断记录＋最小可行仓位真金验证替代纸上模拟（纸上模拟练动作不产生心理后果）；不能实盘时整条标注『合成演练，非实盘』。",
+        "notes": "正面场景：替代无约束的纸上模拟（intent：替代无约束的纸上模拟）。"
+      },
+      {
+        "id": "forecast-log-st-04",
+        "type": "should_trigger",
+        "prompt": "我一会儿用均线一会儿用突破打法，感觉时灵时不灵。想用数据比一比，哪套打法更适合我。",
+        "expected_behavior": "调用判断校准预测日志：两套打法分别累计记录与对错判定，用样本数据择优；如实标注统计口径与样本量。",
+        "notes": "正面场景：方法间数据择优（intent：校准盘感或方法有效性）。"
+      },
+      {
+        "id": "forecast-log-snt-01",
+        "type": "should_not_trigger",
+        "prompt": "记录的事我知道了。你现在就教我：怎么判断一段行情是上升趋势还是下降趋势？",
+        "expected_behavior": "不应调用预测日志卡；判读方法本身应触发最小阻力路线趋势判读卡。",
+        "notes": "跨卡混淆诱饵→min-resistance-trend-skill。区分线：本卡只管『把判读写成可核对的承诺并计分』，不提供任何判读方法。"
+      },
+      {
+        "id": "forecast-log-snt-02",
+        "type": "should_not_trigger",
+        "prompt": "把上次亏 40% 那笔给我归因下：我到底错在轻信消息、不肯认错，还是仓位太重？帮我把行为链写出来，再给我一条戒律。",
+        "expected_behavior": "不应调用预测日志卡；错误的事后归因与戒律转化应触发交易心理与状态自检卡。",
+        "notes": "跨卡混淆诱饵→mind-state-discipline-skill。区分线：本卡止于『对错判定』，事后归因复盘归复盘/心理侧。"
+      },
+      {
+        "id": "forecast-log-snt-03",
+        "type": "should_not_trigger",
+        "prompt": "帮我按利弗莫尔的规则列一套铁律，我要打印出来贴屏幕边上，每天开盘前对照一遍。",
+        "expected_behavior": "不应调用预测日志卡；条文清单需求应触发利弗莫尔成文规则总表卡。",
+        "notes": "跨卡混淆诱饵→livermore-rules-checklist。区分线：查『动作是否违反条文』归清单卡，本卡查『判断是否兑现』。"
+      },
+      {
+        "id": "forecast-log-edge-01",
+        "type": "edge_case",
+        "prompt": "别整那些记录形式。你直接预测下周哪只票会涨，我拿小本记下来验证你，行不行？",
+        "expected_behavior": "判停：本卡不生成预测，只记录与核对用户自己的判断；拒绝『替用户预测』并说明日志的记录对象是用户判断（要方法转趋势判读卡，回来只做记录）。",
+        "notes": "边界：算命式请求判停（B 段反场景第 1 条＋E 段判停）。"
+      },
+      {
+        "id": "forecast-log-edge-02",
+        "type": "edge_case",
+        "prompt": "帮我记一条预测：我觉得这票下个月会涨。",
+        "expected_behavior": "缺可核对数值：先询问补全预期方向、可核对的价格区间或幅度、截止时间；不得静默替用户把模糊预测补成具体数字；用户拒绝补全则不录入并说明『不可核对的预测不进日志』。",
+        "notes": "边界：模糊预测缺可核对数值（E 段输入契约）。"
+      }
+    ]
+  },
+  {
+    "skill": "livermore-rules-checklist",
+    "capability_id": "cap.som.livermore-rules-checklist",
+    "version": "1.0.0",
+    "test_cases": [
+      {
+        "id": "livermore-rules-checklist-st-01",
+        "type": "should_trigger",
+        "prompt": "利弗莫尔不是留下过 15 条交易规则吗？原话都是什么？给我完整列出来。",
+        "expected_behavior": "调用利弗莫尔成文规则总表：逐字照录附录二 15 条（可按需含封底 6 条）并标注出处，不增删改写；声明附录二系丁圣元整理成文。",
+        "notes": "正面场景：直接问规则原文（intent：问利弗莫尔有哪些规则原则）。"
+      },
+      {
+        "id": "livermore-rules-checklist-st-02",
+        "type": "should_trigger",
+        "prompt": "明天我打算给手上的票加仓。下单前你拿纪律清单（checklist）帮我逐条过一遍，看有没有踩线的。",
+        "expected_behavior": "调用利弗莫尔成文规则总表：按场景（建仓/加码）检索对应条文，逐条给出条文原文＋出处＋边界提示；命中多条时全部列出并声明原书未给优先级。",
+        "notes": "正面场景：下单前过纪律清单（intent：下单前或持仓中查纪律清单）。"
+      },
+      {
+        "id": "livermore-rules-checklist-st-03",
+        "type": "should_trigger",
+        "prompt": "我今天在一只亏 8% 的票上又买了 2000 股，想把成本摊低点。这个动作违反了他的哪条规则？",
+        "expected_behavior": "调用利弗莫尔成文规则总表：命中第 8 条（绝不平摊亏损的头寸）与第 9 条（绝不追加保证金），照录条文与出处（附录二），边界提示 A 股 T+1 下补仓即锁定次日风险，转介试探—验证—加码建仓卡。",
+        "notes": "正面场景：对照动作查违规（intent：对照自己的动作查违反哪条；场景检索表第一行）。"
+      },
+      {
+        "id": "livermore-rules-checklist-st-04",
+        "type": "should_trigger",
+        "prompt": "这半年连着亏，我决定给自己立几条死规矩。按利弗莫尔的规则帮我整理一套能贴墙上的铁律。",
+        "expected_behavior": "调用利弗莫尔成文规则总表：从附录二 15 条＋封底 6 条提炼可勾选铁律清单并注明出处；声明清单不构成盈利保证（第 15 条、封底第 6 条）。",
+        "notes": "正面场景：连续亏损后重建纪律（intent：连续亏损后重建纪律）。"
+      },
+      {
+        "id": "livermore-rules-checklist-snt-01",
+        "type": "should_not_trigger",
+        "prompt": "规则我都能背出来，问题是每次到关键时刻就是做不到，一亏就上头。你帮我查查我心理上到底哪里出了问题。",
+        "expected_behavior": "不应调用规则总表卡；『知道规则做不到』的情绪与动机诊断应触发交易心理与状态自检卡。",
+        "notes": "跨卡混淆诱饵→mind-state-discipline-skill。区分线：清单查动作 vs 条文，情绪与动机归心理自检卡（B 段：用清单替代心理自检是反场景）。"
+      },
+      {
+        "id": "livermore-rules-checklist-snt-02",
+        "type": "should_not_trigger",
+        "prompt": "第 5 条说亏损要从速了结，我认。那具体到我这单：止损挂多少钱合适、用市价还是限价、卖了之后剩下的仓位怎么办？",
+        "expected_behavior": "不应调用规则总表卡（条文检索已完成）；具体止损价位与执行属仓位动作，应触发头寸管理卡。",
+        "notes": "跨卡混淆诱饵→position-holding-exit-skill。区分线：条文命中后追问操作细节按检索表转介，本卡不越界展开（E 段判停）。"
+      },
+      {
+        "id": "livermore-rules-checklist-snt-03",
+        "type": "should_not_trigger",
+        "prompt": "第 2 条说要与总体市场保持一致。那你教教我：怎么判断现在总体市场是涨势还是跌势？",
+        "expected_behavior": "不应调用规则总表卡；趋势判读方法应触发最小阻力路线趋势判读卡。",
+        "notes": "跨卡混淆诱饵→min-resistance-trend-skill。区分线：条文背后的深度方法归对应深度卡（场景检索表：大方向拿不准→趋势判读）。"
+      },
+      {
+        "id": "livermore-rules-checklist-edge-01",
+        "type": "edge_case",
+        "prompt": "这 15 条里哪条最重要？帮我按重要性从高到低排个序。",
+        "expected_behavior": "拒绝排序：原书未给规则间优先级与冲突消解说明，不得编造排序；可给出功能分组但须声明『本卡整理，非原书结构』。",
+        "notes": "边界：优先级排序禁答（B 段反场景第 1 条）。"
+      },
+      {
+        "id": "livermore-rules-checklist-edge-02",
+        "type": "edge_case",
+        "prompt": "照这 15 条做是不是就稳赚不赔了？大概能到多高的胜率？",
+        "expected_behavior": "明确否定：第 15 条（没有百发百中的交易规则）与封底第 6 条（没有人能持续打败市场）本身即否定；清单用于少犯错，不构成盈利保证，不给胜率承诺。",
+        "notes": "边界：清单不是盈利保证（B 段反场景第 2 条＋bundle stop_conditions 收益承诺停止条件）。"
+      }
+    ]
+  }
+]

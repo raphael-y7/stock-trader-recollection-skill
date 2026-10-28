@@ -1,0 +1,69 @@
+{
+  "skill": "mind-state-discipline-skill",
+  "version": "1.0.0",
+  "test_cases": [
+    {
+      "id": "mind-state-discipline-skill-st-01",
+      "type": "should_trigger",
+      "prompt": "连亏五把了，我把下个月要还房贷的 3 万块都转进了证券账户。今天开盘前心跳得厉害，就想满仓干一票，把亏的 2.8 万全挣回来。",
+      "expected_behavior": "调用交易心理与状态自检：三查命中动机不纯（翻本/为账单交易）→撤单停手、生活资金与交易资金隔离，期间只观察不交易，并给出恢复复检条件。",
+      "notes": "正面场景：翻本冲动＋为账单交易（intent：翻本报复性交易自检/为账单交易检查）。"
+    },
+    {
+      "id": "mind-state-discipline-skill-st-02",
+      "type": "should_trigger",
+      "prompt": "这个单子我满仓拿了两周，天天睡不着，半夜心跳加速摸手机看盘。是不是仓位太重了？要不要减点？",
+      "expected_behavior": "调用交易心理与状态自检：仓位压力检查命中（睡不着＝头寸过大）→减仓，减到『睡得着』为止，并给出恢复条件。",
+      "notes": "正面场景：仓位压力失眠（intent：仓位压力睡不着怎么办）。"
+    },
+    {
+      "id": "mind-state-discipline-skill-st-03",
+      "type": "should_trigger",
+      "prompt": "我那票亏了 12%，但我觉得公司基本面没变，是市场错了，主力在故意砸坑。我就拿着等它回来，市场迟早还我公道。",
+      "expected_behavior": "调用交易心理与状态自检：识别希望恐惧倒置（亏损抱希望）与『与纸带争辩』→归零重判：只说盘面事实（高低点结构、关键位得失），不援引『市场错了』叙事。",
+      "notes": "正面场景：亏损抱希望＋与市场争辩（intent：与市场争辩立场绑架怎么破）。"
+    },
+    {
+      "id": "mind-state-discipline-skill-st-04",
+      "type": "should_trigger",
+      "prompt": "上次我一把亏掉一半积蓄。我想认真复盘到底错在哪一环，把它变成一条以后能对照检查的铁规矩，怎么弄？",
+      "expected_behavior": "调用交易心理与状态自检：错误转化四步——定位错误环节→归因写行为链→写成『绝不……』戒律→下不为例验收，产出一条可勾选的戒律条目。",
+      "notes": "正面场景：大亏后复盘防再犯（intent：大亏后怎么复盘防再犯）。"
+    },
+    {
+      "id": "mind-state-discipline-skill-snt-01",
+      "type": "should_not_trigger",
+      "prompt": "心态我自我感觉还行。你就直接告诉我：这单止损挂多少钱合适、浮盈的单怎么跟、真要卖怎么卖？",
+      "expected_behavior": "不应调用心理自检卡；具体止损价/跟进/执行属仓位动作规则，应触发头寸管理卡。",
+      "notes": "跨卡混淆诱饵→position-holding-exit-skill。区分线：本卡输出自检结论与停手/减仓指令，仓位动作规则归头寸管理卡。"
+    },
+    {
+      "id": "mind-state-discipline-skill-snt-02",
+      "type": "should_not_trigger",
+      "prompt": "我倒不是心态崩了。我就是想搞清楚：群里那个自称内部人士发的利好截图，到底能不能信？",
+      "expected_behavior": "不应调用心理自检卡；外部信息可信度检验应触发贴士与权威信息防御卡。",
+      "notes": "跨卡混淆诱饵→tips-and-authority-defense-skill。区分线：本卡审内在状态（情绪/动机），外来信息的结构与可信度归信息防御卡。"
+    },
+    {
+      "id": "mind-state-discipline-skill-snt-03",
+      "type": "should_not_trigger",
+      "prompt": "别跟我聊情绪。你就对照利弗莫尔那 15 条规则，看看我今天在亏损票上补仓这个动作违反了哪一条。",
+      "expected_behavior": "不应调用心理自检卡；条文检索应触发利弗莫尔成文规则总表卡（先查条文违规，再问违规动机才归本卡）。",
+      "notes": "跨卡混淆诱饵→livermore-rules-checklist。区分线：动作 vs 条文的检索归规则总表卡。"
+    },
+    {
+      "id": "mind-state-discipline-skill-edge-01",
+      "type": "edge_case",
+      "prompt": "亏掉一半积蓄之后，我已经失眠两个月了，情绪一直很低落，对什么都提不起兴趣。你多陪我聊聊交易，让我好受一点。",
+      "expected_behavior": "识别超出交易语境的状态问题：声明本卡不是心理治疗，长期失眠/抑郁倾向应寻求专业帮助（医疗/心理咨询）；交易侧仅给停手与资金隔离建议，不当情绪陪伴供给。",
+      "notes": "边界：非心理治疗（B 段反场景第 2 条）——区分交易状态管理与心理健康问题。"
+    },
+    {
+      "id": "mind-state-discipline-skill-edge-02",
+      "type": "edge_case",
+      "prompt": "帮我做个交易前的心理自检。",
+      "expected_behavior": "缺输入：应先询问持仓与浮盈亏、近期盈亏记录、睡眠与情绪自述、资金是否混用，不得静默勾选三查。",
+      "notes": "边界：输入契约缺失（持仓明细/状态自述）——先询问而非编造。"
+    }
+  ]
+}

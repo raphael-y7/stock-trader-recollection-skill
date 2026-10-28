@@ -1,0 +1,69 @@
+{
+  "skill": "min-resistance-trend-skill",
+  "version": "1.0.0",
+  "test_cases": [
+    {
+      "id": "min-resistance-trend-skill-st-01",
+      "type": "should_trigger",
+      "prompt": "帮我看看这只票的日线：最近四个月低点从 10.5 抬到 11.2 再到 12.0，高点从 12.4 抬到 13.1 再到 13.9，现在收在 13.5。它现在算什么趋势？我该看多还是看空？",
+      "expected_behavior": "调用最小阻力路线趋势判读：按高低点结构判为上升趋势（更高的高点＋更高的低点），输出方向结论（只考虑买/持）与时机结论（无确认信号则等待），不做目标价预测。",
+      "notes": "正面场景：高低点三分类判读＋方向判定（intent：判断当前市场趋势方向）。"
+    },
+    {
+      "id": "min-resistance-trend-skill-st-02",
+      "type": "should_trigger",
+      "prompt": "这票从 15 块一路阴跌到现在 11 块，中间就反弹过一两次，每次都没超过前一个高点，我又想抄底又怕接飞刀。现在到底该站哪边？",
+      "expected_behavior": "调用最小阻力路线趋势判读：判为下降趋势（更低的低点＋更低的高点），A 股无裸卖空映射为减仓/空仓观望；不因『跌了很多』而反向抄底。",
+      "notes": "正面场景：下降趋势判读＋多空立场（intent：决定多空立场）。"
+    },
+    {
+      "id": "min-resistance-trend-skill-st-03",
+      "type": "should_trigger",
+      "prompt": "我的票之前涨得很顺，回调都很浅，最近两个月完全变了：天天阴跌，偶尔反弹一下就又掉头往下。趋势是不是已经变了？我不想听原因，就告诉我方向。",
+      "expected_behavior": "调用最小阻力路线趋势判读：按『连续推进＋小幅回落 → 逐步退却＋偶尔反弹』结构判定最小阻力路线已转向，转变判断不需要等解释，直接更新状态并提示动作。",
+      "notes": "正面场景：趋势转变识别（intent：识别趋势是否转变；『不需要解释』语言信号）。"
+    },
+    {
+      "id": "min-resistance-trend-skill-st-04",
+      "type": "should_trigger",
+      "prompt": "研报都说这家公司基本面向好、业绩预增，可股价就是一直创新低，技术和消息完全打架。我该信盘面还是信研报？",
+      "expected_behavior": "调用最小阻力路线趋势判读：执行分层校验——纸带信号与基本形势冲突时以纸带为准，把基本分析结论降级为背景备注，并在结论中注明两层是否一致。",
+      "notes": "正面场景：基本形势与盘面冲突的裁决（intent：核对基本形势与盘面是否一致）。"
+    },
+    {
+      "id": "min-resistance-trend-skill-snt-01",
+      "type": "should_not_trigger",
+      "prompt": "方向的事我自己会看。你就直接说，这个票我该挂多少价位买？12.5 还是 12.8？给我一个具体的买入价。",
+      "expected_behavior": "不应调用趋势判读卡；『在哪个具体价位动手』应触发关键点体系卡。",
+      "notes": "跨卡混淆诱饵→key-point-trading-skill。区分线：本卡停在『方向＋时机闸门』，具体价位归关键点体系卡（min-resistance-trend-skill A2 相邻区分线第 1 条）。"
+    },
+    {
+      "id": "min-resistance-trend-skill-snt-02",
+      "type": "should_not_trigger",
+      "prompt": "我手里的票浮盈 30% 了，就是拿不住，天天想卖一半落袋。止盈和移动止损（trailing stop）该怎么设？",
+      "expected_behavior": "不应调用趋势判读卡；持仓处置问题应触发头寸管理卡。",
+      "notes": "跨卡混淆诱饵→position-holding-exit-skill。区分线：判『动手后拿多久、怎么加减仓退出』归头寸管理卡。"
+    },
+    {
+      "id": "min-resistance-trend-skill-snt-03",
+      "type": "should_not_trigger",
+      "prompt": "A股我就不看了，帮我看看现在原油期货能不能做空？哪个合约合适？",
+      "expected_behavior": "不应调用本包任何能力卡；期货等市场的直接操作指引超出本书范围（out_of_scope）。",
+      "notes": "一般诱饵：out-of-scope 市场与品种，非本书射程。"
+    },
+    {
+      "id": "min-resistance-trend-skill-edge-01",
+      "type": "edge_case",
+      "prompt": "别跟我讲什么趋势结构，你就说大盘明天是涨还是跌，给个准话。",
+      "expected_behavior": "不输出涨跌预测：纸带不预测报价（原书：绝不会告诉你下一个星期四下午 1:35 你有多少身家）。可说明为何拒答并引导到方向判读方法，但不得给出『明天涨/跌』结论。",
+      "notes": "边界：单日涨跌预测是本卡禁答项（B 段反场景）——区分严肃方向判读与报价预测。"
+    },
+    {
+      "id": "min-resistance-trend-skill-edge-02",
+      "type": "edge_case",
+      "prompt": "现在市场算什么趋势？能进场吗？帮我判断一下。",
+      "expected_behavior": "缺标的、周期与高低点数据：应先询问要判读的标的与周期，不得静默猜周期，也不得凭空给出三分类结论。",
+      "notes": "边界：输入契约缺失——先询问而非编造（E 段输入契约①）。"
+    }
+  ]
+}

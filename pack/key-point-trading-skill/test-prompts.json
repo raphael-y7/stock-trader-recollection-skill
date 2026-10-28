@@ -1,0 +1,69 @@
+{
+  "skill": "key-point-trading-skill",
+  "version": "1.0.0",
+  "test_cases": [
+    {
+      "id": "key-point-trading-skill-st-01",
+      "type": "should_trigger",
+      "prompt": "某股三个月一直在 11.2 到 12.0 之间横着，今天放量收在 12.6。我能追吗？还是再等等？",
+      "expected_behavior": "调用关键点体系：建关键点清单（区间上沿 12.0/下沿 11.2/前高等），价格已出区间→核对突破确认两点（确定无疑＋顺突破方向），预设失效位（跌回 12.0 之下即判整轮行情假象离场）后再谈动手。",
+      "notes": "正面场景：横盘区间突破触发（intent：判断突破该不该追）。"
+    },
+    {
+      "id": "key-point-trading-skill-st-02",
+      "type": "should_trigger",
+      "prompt": "这票都涨到 80 多块了，历史上从来没这么高过。是不是太贵了不能买？要不等等回调再上车？",
+      "expected_behavior": "调用关键点体系：执行价格高低否决项检查——『太高了不敢买』按原书判为无效理由删除；买点只认突破关键点，绝对价格高低不构成买卖理由。",
+      "notes": "正面场景：破除太贵/太便宜的价格锚（intent：破除价格锚）。"
+    },
+    {
+      "id": "key-point-trading-skill-st-03",
+      "type": "should_trigger",
+      "prompt": "上周我追了个突破，买在 23.5，这两天又跌回 22.8 了。是不是这波突破失败了？我该怎么办？",
+      "expected_behavior": "调用关键点体系：执行失效条款——跌回起涨关键点之下即判定整轮行情为假象，按市价离场，不解释、不等待，『唯一该做的就是停止继续犯错』。",
+      "notes": "正面场景：追突破被套的失效判定与离场（intent：设定突破交易的失效位）。"
+    },
+    {
+      "id": "key-point-trading-skill-st-04",
+      "type": "should_trigger",
+      "prompt": "最近大盘死水一潭，我一天不交易就手痒，总觉得该做点什么。你帮我看看现在到底有没有行情可做？",
+      "expected_behavior": "调用关键点体系：可交易性判停——近期波动幅度与方向清晰度不足以构成一笔正经行情→结论空仓等待，『没有行情』本身就是事实，不做就是操作。",
+      "notes": "正面场景：没行情就不做的频率闸门（intent：判定当前有没有行情可做）。"
+    },
+    {
+      "id": "key-point-trading-skill-snt-01",
+      "type": "should_not_trigger",
+      "prompt": "价位的事先放一放。我就想确认一件事：现在这个市场整体是牛市还是熊市？大方向定了我自己会挑买点。",
+      "expected_behavior": "不应调用关键点体系卡；大盘方向判定应触发最小阻力路线趋势判读卡。",
+      "notes": "跨卡混淆诱饵→min-resistance-trend-skill。区分线：本卡的前提是趋势状态已由趋势判读卡给出（横向→本卡，定向→本卡提供触发器）。"
+    },
+    {
+      "id": "key-point-trading-skill-snt-02",
+      "type": "should_not_trigger",
+      "prompt": "突破条件我确认过了，准备进场。就是想问这笔钱该一把买进去还是分三批买？每一批买多少怎么定？",
+      "expected_behavior": "不应调用关键点体系卡；分批建仓顺序与仓位分配应触发试探—验证—加码建仓卡。",
+      "notes": "跨卡混淆诱饵→probe-and-scale-in-skill。区分线：价位触发归本卡，动手后怎么分批建仓归建仓程序卡。"
+    },
+    {
+      "id": "key-point-trading-skill-snt-03",
+      "type": "should_not_trigger",
+      "prompt": "群里朋友说这票马上要突破 20 块了，还说主力已经埋伏好了就等拉抬。这种说法靠谱吗？",
+      "expected_behavior": "不应调用关键点体系卡；『主力埋伏』属消息可信度裁决，应触发贴士与权威信息防御卡。",
+      "notes": "跨卡混淆诱饵→tips-and-authority-defense-skill。区分线：涉及消息文本的可信度归信息防御卡，本卡只认盘面价位结构。"
+    },
+    {
+      "id": "key-point-trading-skill-edge-01",
+      "type": "edge_case",
+      "prompt": "某股在 15 到 16 块之间横了俩月，现在 15.5。我又怕踏空又怕被套，要不要先买一半放着？",
+      "expected_behavior": "判停分支：当前价位于区间内→结论观望/不沾手，输出『向上突破 16 买、向下跌破 15 卖/回避』的待命触发价，不给区间内动手许可；同时附可交易性一行。",
+      "notes": "边界：区间内不动手的判停（Step 2）——横盘抢跑是书中 ce02 失败模式。"
+    },
+    {
+      "id": "key-point-trading-skill-edge-02",
+      "type": "edge_case",
+      "prompt": "这票今天涨停封板突破了前高 18.5。我明天集合竞价直接挂高价追进去行不行？",
+      "expected_behavior": "涨停封板当日无法验证突破真假：应以收盘站上＋次日不跌回为确认（标注『约定』，原书为连续报价市场），提示 T+1 与追高风险，并先预设失效位再谈进场。",
+      "notes": "边界：A 股涨跌停制度下的突破确认滞后（阶段 0 批判②）。"
+    }
+  ]
+}
