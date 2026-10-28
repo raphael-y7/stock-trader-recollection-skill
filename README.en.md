@@ -114,7 +114,7 @@ The nature of this particular book shaped the distillation: it is an interview-f
 
 ## Testing and validation
 
-This repository ships the test material from the generation process: `evals/` holds 90 trigger cases (`test-prompts.json`) and the item-by-item scoring record `test-results.md` — including the failures and the rework that followed, not just the passing records.
+This repository ships the test material from the generation process: the test material lives in each skill directory as `test-prompts.json` — the 90 entry-level trigger cases are under `single/stock-trader-recollection-skill/`, and each of the 7 promoted pack skills has 9 cases of its own. The item-by-item scoring record is the root-level `test-results.md`, including the failures and the rework that followed, not just the passing records.
 
 - **Trigger precision**: 90 blind-test cases, 86 / 90 (95.6%) overall. should_trigger positives 40 / 40, cross-card confusion decoys 29 / 29, general decoys 1 / 1, edge_case 16 / 20
 - **One real failure, fixed**: the first round was 39 / 40 on positives — "verified fundamentals diverge from the price, which do I trust" was mis-routed to the information-defence card. Judged a skill fix: the two descriptions overlapped on "news versus tape divergence". The trend card now explicitly catches "verified business/industry situation diverging from price", and the information-defence card narrowed to "event news and rumour verification"; an independent re-test passed
@@ -126,61 +126,31 @@ This repository ships the test material from the generation process: `evals/` ho
 
 ```text
 stock-trader-recollection-skill/
-├── README.md                      ← Chinese version
-├── README.en.md                   ← the file you are reading
-├── LICENSE                        ← MIT
-├── BOOK_OVERVIEW.md               ← whole-book understanding (Adler, stage 0)
-├── verified.md                    ← triple-verification results for 81 candidates, with merge groups
-├── INDEX.md                       ← skill map (capability table + dependencies + loading order)
-├── TEST_SUMMARY.md                ← stage 4 stress-test summary (scope / structure / results / regression use)
-├── CANGJIE_ADAPTATION.md          ← cangjie adaptation note (source text / distillation goals / evidence rules / limits)
-├── candidates/                    ← stage 1 candidate pool (5 text candidates; no images or PDFs)
-│   ├── framework.md
-│   ├── principle.md
-│   ├── case.md
-│   ├── counter-example.md
-│   └── glossary.md
-├── bundle/                        ← the card source (single source of truth for this distillation)
-│   ├── verified.yaml              ← normalised definitions of the 10 capabilities (slug / criteria / destination)
-│   ├── cards/                     ← 10 capability cards, filenames all ending in -skill.md
-│   └── book/
-│       ├── overview.md            ← whole-book overview
-│       └── glossary.md            ← glossary
-├── single/                        ← single-entry mode
-│   └── stock-trader-recollection-skill/
-│       ├── SKILL.md               ← entry: trigger conditions + routing table + loading rules
-│       ├── BUILD_MANIFEST.json    ← build manifest and file hashes
-│       ├── test-prompts.json      ← copy of the 90 trigger cases (suite level, kept with the entry skill)
-│       └── references/
-│           ├── overview.md        ← whole-book overview
-│           ├── capability-index.md  ← full intent and keyword index
-│           ├── cheatsheet.md      ← decision rules at a glance
-│           ├── glossary.md        ← glossary
-│           └── capabilities/      ← the 10 capability cards
-├── pack/                          ← multi-entry mode (compact pack)
-│   ├── BUILD_MANIFEST.json
-│   ├── capability-destinations.json
-│   ├── stock-trader-recollection-skill-router/
-│   │   ├── SKILL.md               ← source router entry
-│   │   └── references/            ← 10 cards + index / cheatsheet / glossary / overview
-│   ├── min-resistance-trend-skill/
-│   │   └── SKILL.md               ← a single file is the complete card
-│   ├── key-point-trading-skill/
-│   │   └── SKILL.md
-│   ├── probe-and-scale-in-skill/
-│   │   └── SKILL.md
-│   ├── position-holding-exit-skill/
-│   │   └── SKILL.md
-│   ├── mind-state-discipline-skill/
-│   │   └── SKILL.md
-│   ├── tips-and-authority-defense-skill/
-│   │   └── SKILL.md
-│   └── stock-sector-behavior-skill/
-│       └── SKILL.md
-├── (note) ← every skill directory also ships a test-prompts.json (trigger and boundary cases)
-└── evals/                          ← test material from the generation process
-    ├── test-prompts.json           ← 90 trigger cases (positives / decoys / edge)
-    └── test-results.md             ← item-by-item scores, failures and rework record
+├── README.md              ← Chinese version
+├── README.en.md           ← you are reading this
+├── LICENSE                ← MIT
+├── BOOK_OVERVIEW.md       ← stage 0 output: Adler whole-book analysis
+├── INDEX.md               ← stage 3 output: skill map + dependencies
+├── verified.md            ← 81 units that passed triple verification (23 merge groups → 10 capability units)
+├── TEST_SUMMARY.md        ← stage 4 output: stress-test summary
+├── CANGJIE_ADAPTATION.md  ← cangjie adaptation notes
+├── GITHUB_REPO.md         ← repository metadata
+├── test-results.md        ← test result records
+├── candidates/            ← stage 1 output: raw candidate pool
+│   ├── frameworks.md      ← framework and method candidates
+│   ├── principles.md      ← principle / rule / calculation candidates
+│   ├── cases.md           ← case candidates from the book
+│   ├── counter-examples.md← counter-example and boundary candidates
+│   └── glossary.md        ← terminology candidates
+├── rejected/              ← stage 1.5 output: rejected units + reasons
+├── bundle/                ← compilation source of truth
+│   ├── verified.yaml      ← capability metadata, criteria and destinations
+│   ├── cards/             ← capability card sources (six sections)
+│   └── book/              ← overview.md + glossary.md
+├── single/                ← single-mode build (one entry + all capability cards)
+│   └── stock-trader-recollection-skill/SKILL.md  ← entry: triggers + routing table + loading rules
+└── pack/                  ← pack-mode build (one router + 7 promoted skills)
+    └── */SKILL.md         ← 8 skills (1 router entry + 7 promoted skills), each shipping a test-prompts.json
 ```
 
 ## How to use

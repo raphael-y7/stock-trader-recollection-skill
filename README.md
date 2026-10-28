@@ -114,7 +114,7 @@ pack 里被晋级为独立 skill 的 7 张卡：
 
 ## 测试与验证
 
-本仓库连生成过程的测试材料一起发布：`evals/` 下是 90 条触发用例（`test-prompts.json`）与逐项评分记录 `test-results.md`——包含失败与回炉修复的完整过程，不是只留通过记录。
+本仓库连生成过程的测试材料一起发布：测试材料见各 skill 目录下的 `test-prompts.json`——入口级 90 条触发用例在 `single/stock-trader-recollection-skill/`，pack 下 7 个晋级 skill 各有 9 条专属用例；逐项评分记录在仓库根目录 `test-results.md`，包含失败与回炉修复的完整过程，不是只留通过记录。
 
 - **触发精度**：90 条独立盲测，合计 86 / 90（95.6%）。其中 should_trigger 正向 40 / 40、跨卡混淆诱饵 29 / 29、一般诱饵 1 / 1，edge_case 16 / 20
 - **一处真实失败并修复**：首轮正向为 39 / 40——「研报基本面与股价背离，该信谁」被误路由到信息防御卡。判定为修 skill：两卡 description 在「消息与盘面背离」上重叠，趋势卡显式接住「已核实的业绩/行业形势与背离」，信息防御卡收窄为「事件性消息/传闻辨伪」，独立复测通过
@@ -126,61 +126,31 @@ pack 里被晋级为独立 skill 的 7 张卡：
 
 ```text
 stock-trader-recollection-skill/
-├── README.md                      ← 你正在看的（中文）
-├── README.en.md                   ← English version
-├── LICENSE                        ← MIT
-├── BOOK_OVERVIEW.md               ← 整书理解（Adler 四步拆解，阶段 0 产出）
-├── verified.md                    ← 81 条候选的三重验证结论与合并组
-├── INDEX.md                       ← skill 地图（能力总表 + 依赖关系 + 加载顺序）
-├── TEST_SUMMARY.md                ← Stage 4 压力测试摘要（范围 / 结构检查 / 结果 / 回归接入）
-├── CANGJIE_ADAPTATION.md          ← 仓颉适配说明（文本状态 / 蒸馏目标 / 证据规则 / 使用边界）
-├── candidates/                    ← 阶段 1 候选池（5 份文本候选；图片 / PDF 不入仓）
-│   ├── framework.md
-│   ├── principle.md
-│   ├── case.md
-│   ├── counter-example.md
-│   └── glossary.md
-├── bundle/                        ← 能力卡源（本次蒸馏的唯一真源）
-│   ├── verified.yaml              ← 10 个能力的规范化定义（slug / 判据 / 去向）
-│   ├── cards/                     ← 10 张能力卡，文件名统一以 -skill.md 结尾
-│   └── book/
-│       ├── overview.md            ← 整书概览
-│       └── glossary.md            ← 术语表
-├── single/                        ← 单一入口模式
-│   └── stock-trader-recollection-skill/
-│       ├── SKILL.md               ← 入口：触发条件 + 路由表 + 加载规则
-│       ├── BUILD_MANIFEST.json    ← 编译清单与文件哈希
-│       ├── test-prompts.json      ← 90 条触发用例副本（suite 级，随入口 skill 归档）
-│       └── references/
-│           ├── overview.md        ← 整书概览
-│           ├── capability-index.md  ← 完整意图与关键词索引
-│           ├── cheatsheet.md      ← 决策规则速查
-│           ├── glossary.md        ← 术语表
-│           └── capabilities/      ← 10 张能力卡
-├── pack/                          ← 多入口模式（compact pack）
-│   ├── BUILD_MANIFEST.json
-│   ├── capability-destinations.json
-│   ├── stock-trader-recollection-skill-router/
-│   │   ├── SKILL.md               ← 来源路由入口
-│   │   └── references/            ← 10 张卡 + 索引 / 速查 / 术语 / 概览
-│   ├── min-resistance-trend-skill/
-│   │   └── SKILL.md               ← 单文件即完整能力卡
-│   ├── key-point-trading-skill/
-│   │   └── SKILL.md
-│   ├── probe-and-scale-in-skill/
-│   │   └── SKILL.md
-│   ├── position-holding-exit-skill/
-│   │   └── SKILL.md
-│   ├── mind-state-discipline-skill/
-│   │   └── SKILL.md
-│   ├── tips-and-authority-defense-skill/
-│   │   └── SKILL.md
-│   └── stock-sector-behavior-skill/
-│       └── SKILL.md
-├── （注）← 各 skill 目录均含 test-prompts.json（该能力的触发与边界用例）
-└── evals/                          ← 生成过程的测试材料
-    ├── test-prompts.json           ← 90 条触发用例（正向 / 诱饵 / edge）
-    └── test-results.md             ← 逐项评分、失败与回炉修复记录
+├── README.md              ← 你正在看的
+├── README.en.md           ← English version
+├── LICENSE                ← MIT
+├── BOOK_OVERVIEW.md       ← 阶段 0 产出：全书 Adler 分析
+├── INDEX.md               ← 阶段 3 产出：skill 总览 + 依赖关系
+├── verified.md            ← 通过三重验证的 81 条判定（23 个合并组 → 10 个能力单元）
+├── TEST_SUMMARY.md        ← 阶段 4 产出：压力测试摘要
+├── CANGJIE_ADAPTATION.md  ← 仓颉适配说明
+├── GITHUB_REPO.md         ← 仓库元数据
+├── test-results.md        ← 测试结果记录
+├── candidates/            ← 阶段 1 产出：原始候选池
+│   ├── frameworks.md      ← 框架与方法候选
+│   ├── principles.md      ← 原则 / 规则 / 计算候选
+│   ├── cases.md           ← 书中案例候选
+│   ├── counter-examples.md← 反例与边界候选
+│   └── glossary.md        ← 术语候选
+├── rejected/              ← 阶段 1.5 产出：被淘汰的单元 + 原因
+├── bundle/                ← 编译事实源
+│   ├── verified.yaml      ← 能力元数据、判据与去向
+│   ├── cards/             ← 能力卡源文件（六段结构）
+│   └── book/              ← overview.md + glossary.md
+├── single/                ← single 模式（1 个入口 + 全部能力卡）
+│   └── stock-trader-recollection-skill/SKILL.md  ← 入口：触发 + 路由表 + 加载规则
+└── pack/                  ← pack 模式（1 个路由入口 + 7 个晋级 skill）
+    └── */SKILL.md         ← 8 个 skill（1 个路由入口 + 7 个晋级 skill），每个附带 test-prompts.json
 ```
 
 ## 如何使用
