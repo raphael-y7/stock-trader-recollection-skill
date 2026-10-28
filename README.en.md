@@ -130,6 +130,7 @@ stock-trader-recollection-skill/
 ├── README.en.md           ← you are reading this
 ├── LICENSE                ← MIT
 ├── BOOK_OVERVIEW.md       ← stage 0 output: Adler whole-book analysis
+├── DIGEST.md              ← stage 5 output: reader-facing distilled long-form essay
 ├── INDEX.md               ← stage 3 output: skill map + dependencies
 ├── verified.md            ← 81 units that passed triple verification (23 merge groups → 10 capability units)
 ├── TEST_SUMMARY.md        ← stage 4 output: stress-test summary
