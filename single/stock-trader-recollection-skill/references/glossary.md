@@ -1,6 +1,6 @@
 # 术语词典（GLOSSARY）— 股票大作手回忆录（丁圣元注疏版）
 
-> 来源：本文件为 `books/stock-trader-recollection-skill/GLOSSARY.md` 的分发副本（阶段 3 复制，随能力包产物分发），内容以原文件为准。
+> 来源：本文件为 `books/stock-operator-memoirs/GLOSSARY.md` 的分发副本（阶段 3 复制，随能力包产物分发），内容以原文件为准。
 
 > 对象：`股票大作手回忆录（丁圣元注疏版）`（正文 24 章 + 译者前言 + 附录一~三）；行号（L）均指 `股票大作手回忆录_合并转写稿.md`。
 > 来源：阶段 1 `candidates/glossary.md` 28 条（全部经原文核验），阶段 3 整理提升为正式词典。

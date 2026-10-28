@@ -1,0 +1,278 @@
+schema_version: 1
+bundle_id: bundle.stock-trader-recollection-skill-memoirs
+book:
+  title: 股票大作手回忆录（丁圣元注疏版）
+  author: ［美］埃德温·勒菲弗（Edwin Lefèvre）著；丁圣元 译/注疏
+  source_pack: books/stock-operator-memoirs
+  baseline_tag: "1922-1923 访谈语境；丁圣元注疏版 2022"
+entry:
+  name: stock-trader-recollection-skill
+  description: >-
+    《股票大作手回忆录（丁圣元注疏版）》单入口：以利弗莫尔（化名拉里·利文斯顿）的实战方法论辅助 A 股个人投资者的股票投资分析——
+    最小阻力路线趋势判读、关键点入场、试探—验证—加码建仓、头寸持有与止损退出、交易心理自检、贴士与权威信息防御、
+    板块与个股行为甄别，另含流动性执行、预测日志与成文规则总表三张路由卡。本书为访谈体传记，所有方法均带 1920s 美股语境，
+    经 A 股制度（T+1、涨跌停、无裸卖空）边界声明后使用。
+  core_principles:
+    - 大势优先：大钱来自主要趋势，先判方向与时机再谈操作
+    - 关键点入场：横盘记录上下极限，确定无疑的突破才动手，跌回关键点即离场
+    - 试探建仓：首笔 1/5 试探，首笔有账面利润才加码，绝不摊平
+    - 盘面优先：价格行为先于消息与解释，"空头打压"100 例 99 例是合理下跌
+    - 防范自己：希望与恐惧倒过来用，仓位压到睡得着，亏损写成戒律
+    - 知行鸿沟与制度风险：规则本身不保证盈利——传主五次破产（1940 年终告破产自杀）、咖啡交易被政府干预清零，执行纪律与制度环境是双重前提
+  out_of_scope:
+    - 日内短线打板与高频交易信号（原书时间尺度为波段至主要趋势层级）
+    - 个股基本面估值与财务分析（原书不提供估值方法）
+    - 具体买卖点位推荐与代客操作建议
+    - 期货外汇等其他市场的直接操作指引（原则可迁移但制度不同）
+  stop_conditions:
+    - 行情数据缺失时只做方法讲解，不输出方向或点位结论
+    - 用户索取确定收益承诺或"必涨代码"时停止并说明原书边界（无人能持续打败市场）
+    - 原书未规定的参数（周期、比例换算）缺失时标注"约定"并询问，不静默编造
+router_entry:
+  name: stock-trader-recollection-skill-router
+  description: >-
+    《股票大作手回忆录（丁圣元注疏版）》来源路由入口：按用户意图路由到全书 10 张能力卡——趋势判读、关键点、建仓程序、
+    头寸管理、心理自检、信息防御、板块甄别、流动性执行、预测日志、成文规则总表；承接整书语境（利弗莫尔生平、
+    1920s 市场制度背景、丁圣元注疏术语体系），并保留未晋级为独立入口的能力卡（流动性执行、预测日志、规则总表）。
+promotion_budget: 8
+capabilities:
+  - capability_id: cap.som.min-resistance-trend-skill
+    revision: 1
+    status: active
+    slug: min-resistance-trend-skill
+    title: 最小阻力路线趋势判读
+    importance: critical
+    importance_rationale: task-01/02 总纲（原书关键任务清单），"大钱来自主要趋势"是全书其余能力的门控前提；方向错则后续全错
+    one_liner: 先用高低点结构把市场判为上升/下降/横向三态，只顺势出方向结论；横向市不出方向只等突破；方向与时机两项评估齐全才允许动手。
+    intents: [判断当前市场趋势方向, 识别趋势是否转变, 决定多空立场, 判断现在能否动手（时机闸门）, 核对基本形势与盘面是否一致]
+    keywords: [最小阻力路线, path of least resistance, 趋势方向, trend direction, 高低点, 牛熊转换, 顺势, 横向震荡, 趋势转变]
+    also_read: [cap.som.key-point-trading-skill, cap.som.position-holding-exit-skill, cap.som.forecast-log]
+    card: cards/min-resistance-trend-skill.md
+    frontmatter:
+      description: >-
+        当用户问当前行情是牛是熊、该看多还是看空、趋势是否已变，或要求判读K线高低点结构时使用；当已核实的业绩/行业形势（研报结论、基本面事实）与股价走势背离、用户问"信盘面还是信基本面"时也用本卡——纸带为准，基本形势降级为背景备注并注明两层是否一致。输出：三分类状态＋方向与时机两项结论＋基本形势一致性备注；横向市只记录上下极限、等突破不出方向；不给目标价、不解释涨跌原因、不预测明日涨跌。不用于：判断某条消息/贴士/传闻/小作文的真伪（用信息防御卡）、具体买点价位（用关键点体系）、仓位与退出（用头寸管理）。触发词：最小阻力路线、趋势方向、trend direction、higher highs、牛熊转换、顺势逆势、基本面背离。
+      tags: [decision, trend, technical-analysis]
+    source_evidence:
+      - source_id: merged-transcript
+        version_id: ding-shengyuan-2022
+        location: 第10章（L1720）；附录三（L3390 起）；第5/9章佐证
+    promotion:
+      destination: promoted
+      gate: {independent_intent: true, independent_contract: true, independent_run: true, independent_reuse: true, independent_eval: true}
+      notes: 合并组 M01+M02+M16+M19；趋势方向判定是高频独立问题，契约（三分类+两项评估）自足
+  - capability_id: cap.som.key-point-trading-skill
+    revision: 1
+    status: active
+    slug: key-point-trading-skill
+    title: 关键点体系
+    importance: critical
+    importance_rationale: task-03/05 核心；"守候关键心理时刻"是原书入市信号的唯一来源，直接对治 A 股散户恐高/捡便宜锚定与频繁交易
+    one_liner: 横盘期记录区间上下极限绝不沾手，关键点被确定无疑突破才顺向动手，跌回关键点即判整轮行情为假象立即离场。
+    intents: [确定该在哪个价位动手, 判断突破该不该追, 设定突破交易的失效位, 破除太贵太便宜的价格锚, 判定当前有没有行情可做]
+    keywords: [关键点, key point, 突破, breakout, 整数关口, 前高前低, 区间上下沿, 横盘等待, 假突破, 可交易性]
+    also_read: [cap.som.min-resistance-trend-skill, cap.som.probe-and-scale-in-skill]
+    card: cards/key-point-trading-skill.md
+    frontmatter:
+      description: >-
+        当用户问横盘市该不该买、突破要不要追、整数关/前高前低怎么用、"涨太多不敢买/跌太多够便宜"、追突破被套怎么办时使用。流程：列关键点清单→区间内不动手（判停）→突破确认→预设失效位（跌回关键点即离场）→删除绝对价格理由。不用于：趋势方向判定（用趋势判读卡）、分批建仓（用建仓程序卡）、目标价预测（本卡不预测）。触发词：关键点、突破、breakout、整数关、前高、横盘、没行情。
+      tags: [decision, entry, technical-analysis]
+    source_evidence:
+      - source_id: merged-transcript
+        version_id: ding-shengyuan-2022
+        location: 第10/14章（关键点定义）；第9章（阿纳康达 292/301）；第5章（整数关 30—50 点）
+    promotion:
+      destination: promoted
+      gate: {independent_intent: true, independent_contract: true, independent_run: true, independent_reuse: true, independent_eval: true}
+      notes: 合并组 M03+M15；"在哪个价位动手"是独立高频意图，含失效判定与可交易性判停
+  - capability_id: cap.som.probe-and-scale-in-skill
+    revision: 1
+    status: active
+    slug: probe-and-scale-in-skill
+    title: 试探—验证—加码建仓程序
+    importance: high
+    importance_rationale: task-04 建仓程序，全书唯一形成量化闭环（1/5 首笔、首笔利润闸门、1:1:2 梯度）的仓位方法；执行层价值依赖前置方向判定
+    one_liner: 先以额度 1/5 试探，首笔有账面利润才加第二笔且只沿盈利方向步步加码，首笔亏损即终止程序、绝无补仓分支。
+    intents: [制定分批建仓计划, 判断该不该加仓及加码条件, 识别并阻止摊平补仓, 用试盘单验证判断或消息, 核算试探建仓成本结构]
+    keywords: [试探建仓, probe order, 分批加码, scale in, 首笔利润, 步步上涨, 摊低成本（禁令）, 试盘, 仓位梯度]
+    also_read: [cap.som.key-point-trading-skill, cap.som.position-holding-exit-skill, cap.som.liquidity-and-execution]
+    card: cards/probe-and-scale-in-skill.md
+    frontmatter:
+      description: >-
+        当用户问一次性买入还是分批、被套要不要补仓摊平、有浮盈能不能加仓加多少、如何用小单验证判断或消息时使用。程序：1/5 试探→首笔利润为加码闸门→只沿盈利方向步步加码（原书梯度 1/5→1/5→2/5、+10/+20 点台阶）→以成交散布验证承接；首笔亏损即终止。不用于：横盘未突破时的提前埋伏（用关键点卡）、建仓后的持有退出（用头寸管理卡）、定投（逻辑相反）。触发词：试仓、加仓、补仓、摊平、scale in、average down。
+      tags: [procedure, position-sizing]
+    source_evidence:
+      - source_id: merged-transcript
+        version_id: ding-shengyuan-2022
+        location: 第7章（110→114 建仓演算）；第10章（首笔利润闸门）；第14章（棉花 1/5→1/5→2/5）
+    promotion:
+      destination: promoted
+      gate: {independent_intent: true, independent_contract: true, independent_run: true, independent_reuse: true, independent_eval: true}
+      notes: 合并组 M05；建仓程序是独立请求（"怎么买"），有输入/步骤/输出契约
+  - capability_id: cap.som.position-holding-exit-skill
+    revision: 1
+    status: active
+    slug: position-holding-exit-skill
+    title: 头寸管理：持有、跟进与退出
+    importance: critical
+    importance_rationale: task-06/07；原书反复验证的核心纪律（不丢头寸、绝不摊平、绝不卖盈保亏），附录二多条"绝不"级条款落此；对治 A 股散户两大亏损源
+    one_liner: 大势未坏就拿住头寸，只在盈利侧跟进止损，识别做错即零延迟离场，绝不摊平、绝不卖盈保亏。
+    intents: [浮盈单该不该止盈或持有, 要不要摊平补仓, 移动止损怎么设怎么移, 何时清仓离场, 卖飞丢头寸怎么办]
+    keywords: [持有纪律, hold, 止盈, take profit, 摊平, average down, 移动止损, trailing stop, 止损位, 离场, exit, 卖飞]
+    also_read: [cap.som.probe-and-scale-in-skill, cap.som.min-resistance-trend-skill, cap.som.mind-state-discipline-skill]
+    card: cards/position-holding-exit-skill.md
+    frontmatter:
+      description: >-
+        当用户纠结浮盈头寸"拿住还是止盈"、被套后想"补仓摊低成本"、询问移动止损怎么设或"何时清仓离场"、懊悔卖飞牛股时使用。核心：先判大势，趋势未坏则持有（"这是牛市"），不为赚差价丢头寸；趋势延续期用赫恩式跟进止损——只在盈利侧加码、止损挂最后一笔成交价下一档并随新高上移；退出三铁律：绝不摊平、绝不卖盈保亏、识别做错即零延迟离场，绝不求卖最高点。适用于顺势持仓处置；不适用于横盘区间、日内短线与定投；A 股按 T+1/涨跌停换算。trigger：持有 hold、止盈 take profit、摊平 average down、移动止损 trailing stop、离场 exit、卖飞。
+      tags: [decision, risk-management]
+    source_evidence:
+      - source_id: merged-transcript
+        version_id: ding-shengyuan-2022
+        location: 第5章（老火鸡"这是牛市"）；第9章（1907-10-24 了结）；第10章（赫恩体系）；第11章（棉花摊平反例）
+    promotion:
+      destination: promoted
+      gate: {independent_intent: true, independent_contract: true, independent_run: true, independent_reuse: true, independent_eval: true}
+      notes: 合并组 M04+M06+M07；"对手里的单子怎么办"是独立高频意图，三子法共享同一契约（持仓状态+行情→处置动作）
+  - capability_id: cap.som.mind-state-discipline-skill
+    revision: 1
+    status: active
+    slug: mind-state-discipline-skill
+    title: 交易心理与状态自检
+    importance: critical
+    importance_rationale: task-13/14；原书称投机者主要敌人藏于内部，ce22（传主五次破产）证明知行鸿沟是全书最大边界；零门槛防御性最强
+    one_liner: 下单前查希望恐惧是否倒置、动机是否为账单、仓位是否压得睡不着；只站市场正确的一边，每笔亏损必须转化为一条戒律。
+    intents: [翻本报复性交易自检, 仓位压力睡不着怎么办, 为账单交易检查, 大亏后怎么复盘防再犯, 与市场争辩立场绑架怎么破]
+    keywords: [希望恐惧倒置, hope-fear inversion, 交易心理, trading psychology, 翻本, revenge trading, 为账单交易, trading for bills, 仓位压力, 失眠, 复盘, 戒律]
+    also_read: [cap.som.position-holding-exit-skill, cap.som.livermore-rules-checklist]
+    card: cards/mind-state-discipline-skill.md
+    frontmatter:
+      description: >-
+        当用户出现"亏损单不想割、盈利单拿不住"的情绪倒置，带着"这个月必须挣出××"的目标交易，拿单失眠心慌，连亏后想立刻翻本，或大亏后问如何复盘防再犯时使用。流程：交易前三查（希望恐惧是否倒置/是否为账单与翻本交易/仓位是否压得睡不着）→不过关即减仓到睡得着或停手，债务压力先隔离本金→交易中只站市场正确的一边，发现与纸带争辩即归零重判→交易后把错误写成一条"绝不"戒律→检查生活资金与交易资金隔离。不替代趋势判断，不是心理治疗；判据为定性自评，阈值需自定义并声明。trigger：翻本 revenge trading、失眠 sleepless、为账单交易 trading for bills、复盘 review、立场 stance。
+      tags: [checklist, psychology, discipline]
+    source_evidence:
+      - source_id: merged-transcript
+        version_id: ding-shengyuan-2022
+        location: 第10章（希望恐惧倒置）；第12章（托马斯惨败心理链）；第13/14章（状态与东山再起）；第17/24章（职业素养与忠告）
+    promotion:
+      destination: promoted
+      gate: {independent_intent: true, independent_contract: true, independent_run: true, independent_reuse: true, independent_eval: true}
+      notes: 合并组 M08+M13+M14+M18；"我该不该交易/怎么管住自己"是独立意图，自检清单契约自足
+  - capability_id: cap.som.tips-and-authority-defense-skill
+    revision: 1
+    status: active
+    slug: tips-and-authority-defense-skill
+    title: 贴士与权威信息防御
+    importance: critical
+    importance_rationale: task-10/11/12；本书证据最密集的失败族（传主三次最大代价皆源于丧失独立判断），A 股"小作文/权威解释"环境迁移价值最高
+    one_liner: 先看盘面再看消息——出场依赖链断裂即拒信、匿名默认不可信、下跌先验为合理下跌（100 例 99 例）、行为证据压倒言语。
+    intents: [检验荐股或内幕消息可信不可信, 判断下跌是打压洗盘还是合理下跌, 评估匿名权威或内部人利好该不该信, 消息与盘面背离以哪个为准, 人情荐股怎么设防]
+    keywords: [贴士, tip, 内幕消息, insider, 小作文, 权威解释, 空头打压, bear raid, 洗盘, shakeout, 匿名利好, rumor]
+    also_read: [cap.som.stock-sector-behavior-skill, cap.som.min-resistance-trend-skill]
+    card: cards/tips-and-authority-defense-skill.md
+    frontmatter:
+      description: >-
+        当用户收到荐股/内幕消息/小作文/大V或匿名权威利好，问"能不能信、要不要买"；或某条事件性消息/传闻与盘面背离、要辨其真伪时；或持仓下跌时引用"主力打压/洗盘/庄家砸盘"解释问该不该卖——用四道防御闸裁决：盘面优先（原因后置）、趋势过滤消息、出场依赖链＋署名/时点/行为三重检验、下跌归因默认"合理下跌"（100例99例）。也处理人情荐股三道防线。不用于：已核实的业绩/行业形势与股价的结构性背离裁决（归趋势判读卡）、技术入场点位、仓位计算、基本面估值；无行情数据时只做来源结构检验，不冒充事实核查。Trigger: tip/insider/rumor/小作文/空头打压/洗盘/is this a shakeout。
+      tags: [decision, information, contrarian]
+    source_evidence:
+      - source_id: merged-transcript
+        version_id: ding-shengyuan-2022
+        location: 第16章（婆罗洲锡业受骗）；第23章（"空头打压"话术与权威解释）；第10章（99/100 论断）；第24章（忠告）
+    promotion:
+      destination: promoted
+      gate: {independent_intent: true, independent_contract: true, independent_run: true, independent_reuse: true, independent_eval: true}
+      notes: 合并组 M09+M11+M12+M23；"这消息能不能信/这跌是不是洗盘"是独立高频意图，四道闸契约完整
+  - capability_id: cap.som.stock-sector-behavior-skill
+    revision: 1
+    status: active
+    slug: stock-sector-behavior-skill
+    title: 个股与板块行为甄别
+    importance: high
+    importance_rationale: task-08/09/12；1916 年逃顶（净赚约 300 万美元）与切斯特汽车案例的直接依据；A 股板块效应显著，内部人数据须换算披露口径
+    one_liner: 板块同涨同跌是常态，掉队与滞涨先于消息发出警告：行为不对路的股票不碰，领头羊集体回落不收复即牛市尾声预警。
+    intents: [掉队股能不能埋伏等补涨, 龙头滞涨是不是行情见顶, 个股走法偏离习性怎么办, 板块强弱对照怎么做, 怎么从盘面看内部人买卖]
+    keywords: [板块一致性, sector consensus, 掉队股, laggard, 补涨, catch-up, 领头羊, leadership, 滞涨, 习性, habit, 内部人行为, insider behavior]
+    also_read: [cap.som.min-resistance-trend-skill, cap.som.tips-and-authority-defense-skill]
+    card: cards/stock-sector-behavior-skill.md
+    frontmatter:
+      description: >-
+        当用户问"同板块都涨就它不涨/还跌，能不能埋伏等补涨""领涨龙头开始滞涨是不是行情完了""这只股票最近走法跟以前不一样""怎么做板块强弱对比""怎么从盘面看内部人在买在卖"时使用。方法：圈定板块成员→做涨跌幅/创新高/回落收复对照表→掉队者先排除吸筹解释，排除不掉则不碰、逆跌则看空；领头羊组回落不收复＝牛市尾声预警；个股行为偏离其历史习性即不碰。信号先于消息，勿以"曾经X元现在Y元便宜"接掉队股。不回答大盘方向（归趋势判读卡），不裁决下跌解释真伪（归信息防御卡）；A 股无裸卖空，看空映射为不碰＋清仓。trigger：掉队 laggard、补涨 catch-up、领头羊 leadership、习性 habit、内部人 insider。
+      tags: [technical-analysis, stock-picking]
+    source_evidence:
+      - source_id: merged-transcript
+        version_id: ding-shengyuan-2022
+        location: 第9章（领头羊组合作业）；第14章（1916 逃顶）；第18章（切斯特汽车）；第23章（内部人行为）
+    promotion:
+      destination: promoted
+      gate: {independent_intent: true, independent_contract: true, independent_run: true, independent_reuse: true, independent_eval: true}
+      notes: 合并组 M10+M20；选股强弱与板块对照是独立意图，对照表契约可独立交付
+  - capability_id: cap.som.liquidity-and-execution
+    revision: 1
+    status: active
+    slug: liquidity-and-execution-skill
+    title: 流动性与执行
+    importance: medium
+    importance_rationale: task-16；原书为大户视角、对个人为降维参考，规则较薄（f25+p09 两条）；但 A 股涨跌停/T+1 使不可成交风险真实存在
+    one_liner: 下单前算相对成交量占比与滑点预算，大额先测市场胃口——"能在卖出的时候卖出，而不是想卖出的时候卖出"。
+    intents: [大单大额持仓进出场可行性, 滑点挂单不成交涨跌停封板怎么办, 市价单还是限价单, 回测与实盘系统性成交差]
+    keywords: [流动性, slippage, 滑点, 冲击成本, 市场胃口, market impact, 成交量占比, 限价单, 市价单, execution gap]
+    also_read: [cap.som.probe-and-scale-in-skill]
+    card: cards/liquidity-and-execution-skill.md
+    frontmatter:
+      description: >-
+        当用户计划的单量相对个股日常成交偏大（小盘股、低流动性、大额持仓），或遇到滑点、挂单不成交、一字板卖不出、市价/限价两难、回测与实盘系统性成交差时——用"市场胃口测试＋执行偏差计入"两件套：试探单读市场反应、分批进出、预先标定流动性窗口、每张单写明指令类型与滑点预算。不用于：仓位比例决定（转头寸管理卡）、触发价位选择（转关键点卡）。Trigger: slippage/market impact/挂单不成交/一字板/limit or market order。
+      tags: [execution, liquidity]
+    source_evidence:
+      - source_id: merged-transcript
+        version_id: ding-shengyuan-2022
+        location: 第2/3章（执行价差教训）；第20/21章（市场胃口与稳定工序）
+    promotion:
+      destination: router
+      gate: {independent_intent: true, independent_contract: true, independent_run: true, independent_reuse: false, independent_eval: true}
+      notes: 合并组 M17；意图独立但证据薄、使用频率低，保留为路由卡防失联
+  - capability_id: cap.som.forecast-log
+    revision: 1
+    status: active
+    slug: forecast-log-skill
+    title: 判断校准预测日志
+    importance: medium
+    importance_rationale: task-02/03 的校准器；成本低可与多卡联用，但原书仅第 1 章少年期一段（f11 单条），无成年后持续使用证据
+    one_liner: 把判断事前写成可核对记录（方向/幅度/窗口/依据），到期逐条判对错——真金小额或明确标记演练验证观察是否精准。
+    intents: [验证自己判断的准确率, 拒绝事后诸葛, 替代无约束的纸上模拟, 校准盘感或方法有效性]
+    keywords: [预测日志, forecast log, 判断校准, calibration, track record, 准确率, 小本记录]
+    also_read: [cap.som.min-resistance-trend-skill]
+    card: cards/forecast-log-skill.md
+    frontmatter:
+      description: >-
+        当用户想知道自己判断准不准（"总感觉看对了却不挣钱""我早就说过"）、想做有约束的练习替代纸上模拟、或想用数据在方法间择优时——用第 1 章"小本预测—事后核对"法：事前成文（标的/现价/方向/幅度/窗口/依据），到期逐条判正确/错误/部分正确，累计样本只做记录性统计。不用于：替用户生成预测本身、样本过少谈准确率、事后归因复盘。Trigger: track record/calibration/预测记录/准确率。
+      tags: [practice, calibration]
+    source_evidence:
+      - source_id: merged-transcript
+        version_id: ding-shengyuan-2022
+        location: 第1章（小本预测—核对法）；附录二第10条互证
+    promotion:
+      destination: router
+      gate: {independent_intent: true, independent_contract: true, independent_run: true, independent_reuse: false, independent_eval: true}
+      notes: 合并组 M21；意图独立但原书证据单薄，保留为路由卡
+  - capability_id: cap.som.livermore-rules-checklist
+    revision: 1
+    status: active
+    slug: livermore-rules-checklist-skill
+    title: 利弗莫尔成文规则总表
+    importance: high
+    importance_rationale: task-18 直接承载；原书唯一成文规则总表（附录二 15 条＋封底 6 条），零改造成本的日常执行清单；作为路由卡向全部深度卡导流
+    one_liner: 按场景检索 15 条成文规则→照录条文与出处→标注边界并转介深度卡——清单用于查违规，不用于保证盈利。
+    intents: [下单前或持仓中查纪律清单, 问利弗莫尔有哪些规则原则, 对照自己的动作查违反哪条, 连续亏损后重建纪律]
+    keywords: [规则清单, checklist, 15条规则, 交易纪律, 利弗莫尔原则, Livermore rules, 绝不摊平, 绝不追加保证金, discipline]
+    also_read: [cap.som.mind-state-discipline-skill, cap.som.position-holding-exit-skill]
+    card: cards/livermore-rules-checklist-skill.md
+    frontmatter:
+      description: >-
+        当用户要可勾选的交易纪律清单、问利弗莫尔说过哪些规则、或描述动作想知道违反哪条时——本卡逐字照录附录二 15 条与封底 6 条，按场景检索（抄底摊平→第8/9条、浮亏不卖→第5/11条、浮盈落袋→第5/6条、频繁交易→第2条、恐高捡便宜→第12条等），给出条文出处与适用边界并转介对应深度卡。不用于：规则优先级排序（原书未给）、仓位计算、情绪诊断；清单不构成盈利保证。Trigger: checklist/15条规则/纪律/违反哪条/Livermore rules。
+      tags: [checklist, rules, discipline]
+    source_evidence:
+      - source_id: merged-transcript
+        version_id: ding-shengyuan-2022
+        location: 附录二（15 条交易规则）；封底（杰西·利弗莫尔的交易原则 6 条）
+    promotion:
+      destination: router
+      gate: {independent_intent: true, independent_contract: true, independent_run: true, independent_reuse: false, independent_eval: true}
+      notes: 合并组 M22；查清单意图独立但作为资源卡经路由导流更符合入口预算（8 已满）

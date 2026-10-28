@@ -8,7 +8,7 @@ metadata:
   cangjie.capability-revision: 1
   cangjie.bundle-id: bundle.stock-trader-recollection-skill-memoirs
   cangjie.source-title: 股票大作手回忆录（丁圣元注疏版）
-  cangjie.tags: technical-analysis, stock-picking-skill
+  cangjie.tags: technical-analysis, stock-picking
 ---
 # 个股与板块行为甄别
 
