@@ -234,4 +234,5 @@ Every numeric criterion in the book (the one-fifth first tranche, the +10/+20 po
 
 ## License
 
-[MIT](https://opensource.org/licenses/MIT)
+[MIT](./LICENSE)
+
